@@ -16,15 +16,19 @@ namespace PPirate.VoxReactor
         private readonly String clothing1StorableID = "VRDollz:Makeup Blush2 VRDMaterialFace";
         private readonly JSONStorable clothing1;
         private float clothing1BlushAlphaInterpolationStart = -1.0f; //current val when we start blushing or deblushing //todo init this to current value from constructor //getFloatParam('Alpha Adjust').val;
-        private float clothing1BlushAlphaTarget = -0.75f;
-        private float clothing1DeblushAlphaTarget = -1.0f; //todo init this to = clothing1BlushAlphaStart
+        private float clothing1AlphaFullBlush = -0.75f;
+        private float clothing1AlphaNoBlush = -1.0f; //todo init this to = clothing1BlushAlphaStart
+        
 
 
         private readonly String clothing2StorableID = "crimeless:face_blushMaterialCombined";
         private readonly JSONStorable clothing2;
         private float clothing2BlushAlphaInterpolationStart = -0.61f; //current val when we start blushing or deblushing //todo init this to current value from constructor //getFloatParam('Alpha Adjust').val;
-        private float clothing2BlushAlphaTarget = -0.365f;
-        private float clothing2DeblushAlphaTarget = -0.61f; //todo init this to = clothing1BlushAlphaStart
+        private float clothing2AlphaFullBlush = -0.365f;
+        private float clothing2AlphaNoBlush = -0.61f; //todo init this to = clothing1BlushAlphaStart
+        
+        
+        private float minBlush = 0f; //in percent /100
 
         #region temp
 
@@ -111,6 +115,7 @@ namespace PPirate.VoxReactor
         IEnumerator DeblushEnumerator()
         {
             // suspend execution for 5 seconds
+            isDeblushing = true;
             yield return new WaitForSeconds(UnityEngine.Random.Range(blushDurationMin, blushDurationMax));
             StartBlushInterpolating(DeBlushUpdate);
 
@@ -133,24 +138,55 @@ namespace PPirate.VoxReactor
             character.main.PushFixedDeltaTimeConsumer(callback);
             currentInterpolationCallback = callback;
         }
+        private bool isDeblushing;
         public void DeBlushUpdate(float deltaTime) {
-            float blush1NewAlpha = linearInterpolate(clothing1BlushAlphaInterpolationStart, clothing1DeblushAlphaTarget, deblushSpeed, deltaTime);
-            float blush2NewAlpha = linearInterpolate(clothing2BlushAlphaInterpolationStart, clothing2DeblushAlphaTarget, deblushSpeed, deltaTime); 
+            if (!isDeblushing) {
+                return;
+            }
+            float target = SimpleLerp(clothing1AlphaNoBlush, clothing1AlphaFullBlush, minBlush);
+            //SuperController
+            float blush1NewAlpha = linearInterpolate(clothing1BlushAlphaInterpolationStart, target, deblushSpeed, deltaTime);
 
-            if (blush1NewAlpha == clothing1DeblushAlphaTarget && blush2NewAlpha == clothing2DeblushAlphaTarget)
+            float target2 = SimpleLerp(clothing2AlphaNoBlush, clothing2AlphaFullBlush, minBlush);
+            float blush2NewAlpha = linearInterpolate(clothing2BlushAlphaInterpolationStart, target2, deblushSpeed, deltaTime);
+
+            if (blush1NewAlpha == clothing1AlphaNoBlush && blush2NewAlpha == clothing2AlphaNoBlush)
             {
                 character.main.RemoveFixedDeltaTimeConsumer(DeBlushUpdate);
+                isDeblushing = false;
+                if (!isBlushed)
+                    return;
+                GlanceDefaults();
+                GazeAtPlayer();
+
                 isBlushed = false;
             }
             clothing1.SetFloatParamValue("Alpha Adjust", blush1NewAlpha);
             clothing2.SetFloatParamValue("Alpha Adjust", blush2NewAlpha);
         }
+        public void SetMinBlush(float minBlush) { 
+            this.minBlush = minBlush;
+            //if (minBlush < Delerp(clothing1AlphaNoBlush, clothing1AlphaFullBlush, clothing1.GetFloatParamValue("Alpha Adjust"))) {
+            if (isDeblushing)
+            {
+                character.main.RemoveFixedDeltaTimeConsumer(DeBlushUpdate);
+                isDeblushing = false;
+            }
+            if (isBlushed) {
+                character.main.RemoveFixedDeltaTimeConsumer(BlushFixedUpdate);
+                isBlushed = false;
+            }
+           
+                
+            //}
+            
+        }
         public void BlushFixedUpdate(float deltaTime)
         {
-            float blush1NewAlpha = linearInterpolate(clothing1BlushAlphaInterpolationStart, clothing1BlushAlphaTarget, blushSpeed, deltaTime);
-            float blush2NewAlpha = linearInterpolate(clothing2BlushAlphaInterpolationStart, clothing2BlushAlphaTarget, blushSpeed, deltaTime);
+            float blush1NewAlpha = linearInterpolate(clothing1BlushAlphaInterpolationStart, clothing1AlphaFullBlush, blushSpeed, deltaTime);
+            float blush2NewAlpha = linearInterpolate(clothing2BlushAlphaInterpolationStart, clothing2AlphaFullBlush, blushSpeed, deltaTime);
 
-            if (blush1NewAlpha == clothing1BlushAlphaTarget && blush2NewAlpha == clothing2BlushAlphaTarget)
+            if (blush1NewAlpha == clothing1AlphaFullBlush && blush2NewAlpha == clothing2AlphaFullBlush)
             {
                 character.main.RemoveFixedDeltaTimeConsumer(BlushFixedUpdate);
                 glancePlugin.LoadPresetShy();
@@ -191,14 +227,15 @@ namespace PPirate.VoxReactor
             timeInterpolating = timeInterpolating + deltaTime;
             return a + (b - a) * progress;
         }
-
-        public void StopBlush() {
-            if (!isBlushed)
-                return;
-            GlanceDefaults();
-            GazeAtPlayer();
-            
-            isBlushed = false;
+        public static float SimpleLerp(float min, float max, float t)
+        {
+            return min + (max - min) * (t/100);
         }
+        public static float Delerp(float min, float max, float value)
+        {
+            return (value - min) / (max - min) * 100;
+        }
+
+       
     }
 }

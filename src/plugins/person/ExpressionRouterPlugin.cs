@@ -34,34 +34,7 @@ namespace PPirate.VoxReactor
         }
 
         public void LoadMood(string mood) {
-            SuperController.LogError("loading mood " + mood);
-            //  SuperController.LogError("is plugin null? " + (null == plugin));
-            // SuperController.LogError("is it null? " + (null == plugin.GetStringChooserJSONParamChoices("LoadMoodFromPath")));
-
-            // plugin.GetStringChooserActionNames
-            /*
-            foreach (var item in plugin.GetPresetFilePathActionNames())
-            {
-                //has LoadMoodFromPath
-                
-                SuperController.LogError("item: " + item);
-            }*/
-
-
-            // var pathAction = plugin.GetPresetFilePathAction("LoadMoodFromPath");
             plugin.CallPresetFileAction("LoadMoodFromPath", "Saves/ExpressionRouter/PPirate/" + mood +".json");
-           // plugin.GetFile
-            //plugin.file
-
-            /*
-            var options = plugin.GetStringChooserJSONParamChoices("LoadMoodFromPath")
-                .Where(path => path.Contains("PPirate"));
-            foreach (var option in options) {
-                if (option.Contains(mood)) {
-                    plugin.SetStringChooserParamValue("LoadMoodFromPath", option);
-                    break;
-                }
-            }*/
         }
 
     }
