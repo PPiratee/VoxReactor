@@ -72,7 +72,6 @@ namespace PPirate.VoxReactor
             if (isBlushed)
                 return;
 
-            character.plugins.faceTimelinePlugin.PlayNervous();
             deblushCoroutine = DeblushEnumerator();
             character.main.RunCoroutine(deblushCoroutine);
 
@@ -142,7 +141,6 @@ namespace PPirate.VoxReactor
             {
                 character.main.RemoveFixedDeltaTimeConsumer(DeBlushUpdate);
                 isBlushed = false;
-                character.plugins.faceTimelinePlugin.PlaySmile();
             }
             clothing1.SetFloatParamValue("Alpha Adjust", blush1NewAlpha);
             clothing2.SetFloatParamValue("Alpha Adjust", blush2NewAlpha);

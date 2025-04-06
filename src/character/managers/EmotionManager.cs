@@ -15,7 +15,6 @@ namespace PPirate.VoxReactor
         private Logger logger2;
 
 
-        private int levelHorny = 0;
         private readonly int incrementHorny = 10;
         private readonly int incrementHappy = 10;
         private readonly int incrementSadness = 10;
@@ -30,11 +29,11 @@ namespace PPirate.VoxReactor
         List<Emotion> concurrentEmotions = new List<Emotion>(); // does not need to be the strongest
         public List<Emotion> allEmotions = new List<Emotion>(); // does not need to be the strongest
 
-        Hornieness hornieness;
-        Happyness happyness;
-        Sadness sadness;
-        Anger anger;
-        Embarrassment embarrasement;
+        public readonly Hornieness hornieness;
+        public readonly Happyness happyness;
+        public readonly Sadness sadness;
+        public readonly Anger anger;
+        public readonly Embarrassment embarrasement;
 
 
 
@@ -50,24 +49,25 @@ namespace PPirate.VoxReactor
 
 
 
-        private readonly String VOX_ACTION_EMOTE_HAPPY = "emote_happy";
-        private readonly String VOX_ACTION_EMOTE_BLUSH = "emote_embarrased";
-        private readonly String VOX_ACTION_EMOTE_HORNY = "emote_horny";
+       // private readonly String VOX_ACTION_EMOTE_HAPPY = "emote_happy";
+       // private readonly String VOX_ACTION_EMOTE_BLUSH = "emote_embarrased";
+       // private readonly String VOX_ACTION_EMOTE_HORNY = "emote_horny";
 
         public readonly ObserverRegistry emotionObserverRegistry;
 
         public static String REGISTRY_ON_HORNY_CHANGED = "hornyChanged";
-        public static String REGISTRY_ON_HAPPY_CHANGED = "happyChanged";
 
 
 
 
 
         public VoxtaCharacter character;
-        FaceTimelinePlugin faceTimeline;
+      
 
 
-        private readonly BlushManager blushManager;
+        //Saves\ExpressionRouter\Moods\
+
+        public readonly BlushManager blushManager;
         public EmotionManager(VoxtaCharacter character) {
             logger2 = new Logger("VoxtaCharacter:Char#" + character.characterNumber, 0);
             logger2.Constructor();
@@ -92,10 +92,6 @@ namespace PPirate.VoxReactor
             allEmotions.AddRange(concurrentEmotions);
 
 
-
-
-
-
             this.emotionObserverRegistry = new ObserverRegistry();
 
             ///horny
@@ -103,9 +99,6 @@ namespace PPirate.VoxReactor
             OnHornyIncrease = new JSONStorableAction("OnHornyIncrease", OnHornyIncreaseCallback);//todo these vam actions should be regiserted on a service and demuxed to here // do I even need this?>
             Main.singleton.RegisterAction(OnHornyIncrease);
             character.actionObserverRegistry.RegisterObserver(VOX_ACTION_AROUSAL_INCREASE + character.characterNumber, OnHornyIncreaseCallback);
-      
-
-
             OnHornyDecrease = new JSONStorableAction("OnHornyDecrease", OnHornyDecreaseCallback);
             Main.singleton.RegisterAction(OnHornyDecrease);
             character.actionObserverRegistry.RegisterObserver(VOX_ACTION_AROUSAL_DECREASE + character.characterNumber, OnHornyDecreaseCallback);
@@ -117,30 +110,20 @@ namespace PPirate.VoxReactor
             character.actionObserverRegistry.RegisterObserver(VOX_ACTION_EMBARRASSMENT_INCREASE + character.characterNumber, OnEmbarrassmentIncreaseCallback);
 
 
-
-            // character.actionObserverRegistry.RegisterObserver(VOX_ACTION_HAPPY_DECREASE + character.characterNumber, OnHappyDecreaseCallback);
-
-
-
-
-            this.faceTimeline = character.plugins.faceTimelinePlugin;
     
             blushManager = new BlushManager(character);
            
 
-            character.actionObserverRegistry.RegisterObserver(VOX_ACTION_EMOTE_HAPPY, EmoteHappy);
-            character.actionObserverRegistry.RegisterObserver(VOX_ACTION_EMOTE_BLUSH, EmoteBlush);
-            character.actionObserverRegistry.RegisterObserver(VOX_ACTION_EMOTE_HORNY, EmoteHorny);
+          //  character.actionObserverRegistry.RegisterObserver(VOX_ACTION_EMOTE_HAPPY, EmoteHappy);
+           // character.actionObserverRegistry.RegisterObserver(VOX_ACTION_EMOTE_BLUSH, EmoteBlush);
+          //  character.actionObserverRegistry.RegisterObserver(VOX_ACTION_EMOTE_HORNY, EmoteHorny);
 
             UpdateContext();
         }
-        
-        public int GetHornyLevel() {
-            return levelHorny;
-        }
+    
         private void OnHornyIncreaseCallback() {
             logger2.StartMethod("OnHornyIncreaseCallback()");
-            hornieness.increase(incrementHorny);
+            hornieness.Increase(incrementHorny);
 
            // this.levelHorny = BindPercent(levelHorny, incrementHorny);
             UpdateContext();
@@ -150,7 +133,7 @@ namespace PPirate.VoxReactor
         private void OnHornyDecreaseCallback()
         {
             logger2.StartMethod("OnHornyDecreaseCallback()");
-            hornieness.decrease(-incrementHorny);
+            hornieness.Decrease(-incrementHorny);
 
 
             //this.levelHorny = BindPercent(levelHorny, -1 * incrementHorny);
@@ -162,25 +145,25 @@ namespace PPirate.VoxReactor
         private void OnHappyIncreaseCallback()
         {
             logger2.StartMethod("OnHappyIncreaseCallback()");
-            happyness.increase(incrementHappy);
+            happyness.Increase(incrementHappy);
             UpdateContext();
         }
         private void OnSadnessIncreaseCallback()
         {
             logger2.StartMethod("OnSadnessIncreaseCallback()");
-            sadness.increase(incrementSadness);
+            sadness.Increase(incrementSadness);
             UpdateContext();
            }
         private void OnAngerIncreaseCallback()
         {
             logger2.StartMethod("OnAngerIncreaseCallback()");
-            anger.increase(incrementAnger);
+            anger.Increase(incrementAnger);
             UpdateContext();
         }
         private void OnEmbarrassmentIncreaseCallback()
         {
             logger2.StartMethod("OnEmbarrassmentIncreaseCallback()");
-            embarrasement.increase(incremenEmbarrassment);
+            embarrasement.Increase(incremenEmbarrassment);
             UpdateContext();
         }
         private Emotion GetStrongestEmotion(List<Emotion> emotions) {
@@ -205,15 +188,14 @@ namespace PPirate.VoxReactor
                 character.voxtaService.voxtaContextService.RemoveContextItem(lastContextItem);
             }
             string context = String.Empty;
-            if (this.levelHorny != 0) {
-              //  context += string.Format(templateHorny, character.name, levelHorny);//todo multiple levels logic here
-            }
+      
 
             Emotion strongest = GetStrongestEmotion(mainEmotions);
             context += character.name + "'s current mood:";
+            strongest.ApplyExpression();
             if (strongest.ShouldShowInContext())
             {
-                 context += strongest.getInfo();//(This is to inform how {1} {0} will be in conversation).
+                 context += strongest.GetInfo();//(This is to inform how {1} {0} will be in conversation).
                  context += ", ";
             }
       
@@ -223,7 +205,7 @@ namespace PPirate.VoxReactor
                 {
                     context += ", ";
                 }
-                context += concurrentEmotions[i].getInfo();
+                context += concurrentEmotions[i].GetInfo();
 
                 if (i == concurrentEmotions.Count - 1)
                 {
@@ -238,32 +220,15 @@ namespace PPirate.VoxReactor
         private void DebugLogEmotions() {
             string logMsg = String.Empty;
             foreach (Emotion e in allEmotions) {
-                logMsg += " " + e.getInfo();
+                logMsg += " " + e.GetInfo();
             
             }
             logger2.DEBUG(logMsg);
         }
 
-        private String lastEmote = null;
-        private void EmoteHappy() {
-            logger2.DEBUG("VOX_ACTION_EMOTE_HAPPY");
-            faceTimeline.PlaySmile();
-        }
-
-        private void EmoteBlush()
-        {
-            logger2.DEBUG("VOX_ACTION_EMOTE_BLUSH");           
-            blushManager.OnBlush();
-        }
-
-        private void EmoteHorny()
-        {
-            logger2.DEBUG("VOX_ACTION_EMOTE_HORNY");            
-            faceTimeline.PlayStartHorny();
-        }
     }
     internal abstract class Emotion {
-        EmotionManager emotionManager;
+        protected EmotionManager emotionManager;
         public readonly string name;
         public float value;
         public bool isNegativeEmotion = false;
@@ -276,21 +241,25 @@ namespace PPirate.VoxReactor
         }
 
 
-        public void increase(float increment) {
+        public void Increase(float increment) {
             value = BindPercent(value, increment);
-            increaseOverride(increment);
+            IncreaseOverride(increment);
             EffectOtherEmotions(increment);
 
         }
-        protected abstract void increaseOverride(float increment);
+        protected abstract void IncreaseOverride(float increment);
 
-        public void decrease(float decrement)
+        public void Decrease(float decrement)
         {
             value = BindPercent(value, decrement);
-            decreaseOverride(decrement);
+            DecreaseOverride(decrement);
           
         }
-        protected abstract void decreaseOverride(float decrement);
+        protected abstract void DecreaseOverride(float decrement);
+        public virtual void ApplyExpression() {
+            emotionManager.character.expressionManager.LoadExpression(name);
+        }
+
 
         private float BindPercent(float currentLevel, float increment)
         {
@@ -306,7 +275,7 @@ namespace PPirate.VoxReactor
 
             return newVal;
         }
-        public string getInfo() { 
+        public string GetInfo() { 
             return string.Format("{0} ({1}%)", name, value);
 
         }
@@ -320,7 +289,7 @@ namespace PPirate.VoxReactor
 
             foreach (var item in emotionsToDecrease)
             {
-                item.decrease(-increment);
+                item.Decrease(-increment);
             }
         }
 
@@ -331,13 +300,18 @@ namespace PPirate.VoxReactor
         public Happyness(EmotionManager emotionManager) : base(emotionManager, "happy", 30f) {
             
         }
-        protected override void increaseOverride(float increment) { 
+        protected override void IncreaseOverride(float increment) { 
             
         }
-        protected override void decreaseOverride(float decrement)
+        protected override void DecreaseOverride(float decrement)
         {
 
         }
+        public override void ApplyExpression()
+        {
+            emotionManager.character.expressionManager.LoadExpression("happy2");
+        }
+
     }
     internal class Sadness : Emotion
     {
@@ -346,14 +320,15 @@ namespace PPirate.VoxReactor
         {
             this.isNegativeEmotion = true;
         }
-        protected override void increaseOverride(float increment)
+        protected override void IncreaseOverride(float increment)
         {
 
         }
-        protected override void decreaseOverride(float decrement)
+        protected override void DecreaseOverride(float decrement)
         {
 
         }
+   
     }
     internal class Anger : Emotion
     {
@@ -362,11 +337,11 @@ namespace PPirate.VoxReactor
         {
             this.isNegativeEmotion = true;
         }
-        protected override void increaseOverride(float increment)
+        protected override void IncreaseOverride(float increment)
         {
 
         }
-        protected override void decreaseOverride(float decrement)
+        protected override void DecreaseOverride(float decrement)
         {
 
         }
@@ -378,11 +353,13 @@ namespace PPirate.VoxReactor
         {
             this.isNegativeEmotion = true;
         }
-        protected override void increaseOverride(float increment)
+        protected override void IncreaseOverride(float increment)
         {
+            emotionManager.blushManager.OnBlush();
+            
 
         }
-        protected override void decreaseOverride(float decrement)
+        protected override void DecreaseOverride(float decrement)
         {
 
         }
@@ -394,16 +371,20 @@ namespace PPirate.VoxReactor
         {
 
         }
-        protected override void increaseOverride(float increment)
+        protected override void IncreaseOverride(float increment)
         {
 
         }
-        protected override void decreaseOverride(float decrement)
+        protected override void DecreaseOverride(float decrement)
         {
 
         }
         public override bool ShouldShowInContext() {
             return true;
+        }
+        public override void ApplyExpression()
+        {
+           // emotionManager.character.expressionManager.LoadExpression("embarrassed"); todo
         }
     }
 

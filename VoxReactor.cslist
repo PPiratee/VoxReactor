@@ -8,6 +8,7 @@ src\character\managers\StateManager.cs
 src\character\managers\TouchManager.cs
 src\character\managers\LookingAtManager.cs
 src\character\managers\ClothingManager.cs
+src\character\managers\ExpressionManager.cs
 src\character\managers\sex\HornyManager.cs
 src\character\managers\sex\SexManager.cs
 src\character\managers\sex\HandJobManager.cs
@@ -18,7 +19,6 @@ src\character\events\EventShowTits.cs
 src\character\VoxtaCharacter.cs
 src\character\VoiceLines.cs
 src\character\PersonPluginsHolder.cs
-src\plugins\person\timeline\FaceTimelinePlugin.cs
 src\plugins\person\timeline\BodyTimeline.cs
 src\plugins\person\timeline\HeadTimeLine.cs
 src\plugins\person\AcidGlancePlugin.cs
@@ -26,6 +26,7 @@ src\plugins\person\ReadMyLipsPlugin.cs
 src\plugins\person\SilverHandJobPlugin.cs
 src\plugins\person\SilverBlowJobPlugin.cs
 src\plugins\person\PoseMePlugin.cs
+src\plugins\person\ExpressionRouterPlugin.cs
 src\plugins\VoxtaPlugin.cs
 src\services\VoxtaService.cs 
 src\services\VoxtaContextService.cs 

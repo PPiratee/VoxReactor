@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using SimpleJSON;
+using PPirate.VoxReactormanagers;
 
 namespace PPirate.VoxReactor
 {
@@ -35,6 +36,8 @@ namespace PPirate.VoxReactor
         public readonly ShakeManager shakeManager;
         public readonly BlowJobManager blowjobManager;
         public readonly ClothingManager clothingManager;
+        public readonly ExpressionManager expressionManager;
+
 
 
         public readonly EventShowTits eventShowTits;
@@ -64,6 +67,7 @@ namespace PPirate.VoxReactor
                 stateManager = new StateManager(this);
                 plugins = new PersonPluginsHolder(this);
                 gazeManager = new GazeManager(this);
+                expressionManager = new ExpressionManager(this);
                 emotionManager = new EmotionManager( this);//depends on gazeManager being set
                 voiceManager = new VoiceManager(this);
                 touchManager = new TouchManager(this);

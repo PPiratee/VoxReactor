@@ -25,7 +25,8 @@ namespace PPirate.VoxReactor
         }
 
         public void SetCanShowTits() {
-            if (character.emotionManager.GetHornyLevel() >= 50)
+            
+            if (character.emotionManager.hornieness.value >= 50)
             {
                 character.voxtaService.voxtaPlugin.SetFlag("canShowTits");
             }
