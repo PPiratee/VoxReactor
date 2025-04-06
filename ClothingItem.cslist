@@ -1,0 +1,17 @@
+src\clothing\ClothingItem.cs
+src\utils\AtomUtils.cs
+src\utils\MacGruber_Utils.cs
+src\utils\Extensions.cs
+src\utils\FloatTriggerManager.cs
+src\utils\CustomFloatTrigger.cs
+src\UI\JSONStorableVector4.cs
+src\UI\MyJSONStorableVector3.cs
+src\UI\MyUIDynamicSlider.cs
+src\UI\MyUIDynamicToggle.cs
+src\UI\UIDynamicToggleArray.cs
+src\UI\UIDynamicV3Slider.cs
+src\UI\UIDynamicV4Slider.cs
+src\UI\UIManager.cs
+src\UI\tabs\UITabBar.cs
+src\UI\tabs\UIPannel.cs
+src\UI\pannels\PannelClothingItem.cs
