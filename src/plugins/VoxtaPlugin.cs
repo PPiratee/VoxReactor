@@ -13,7 +13,7 @@ namespace PPirate.VoxReactor
         private readonly Main main;
         private readonly Logger logger = new Logger("VoxtaPlugin");
 
-        public static readonly String voxtaPluginStorableID = "3_Voxta";
+        public static readonly String voxtaPluginStorableID = "Voxta";
         private readonly JSONStorable voxtaPlugin;
 
         public static string STATE_IDLE = "idle";

@@ -9,7 +9,7 @@ namespace PPirate.VoxReactor
    
     internal class Logger
     {
-        public static bool logsEnabled = true;
+        public static bool logsEnabled = false;
 
         public static bool debugLogsEnabled = false;
         public bool debugLogsEnabledOverride;
