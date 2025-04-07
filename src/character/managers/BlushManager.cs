@@ -47,6 +47,7 @@ namespace PPirate.VoxReactor
             if (isBLushing) {
                 return;
             }
+            glancePlugin.LoadPresetShy();
 
             isBLushing = true;
             currentSpeed = blushSpeed;
@@ -76,6 +77,7 @@ namespace PPirate.VoxReactor
             if (isDone && isDone2) {
                 if (!isBLushing) {
                     pendingDeBlush = false;
+                    glancePlugin.LoadPresetDefault();
                 }
                 isBLushing = false;
                 character.main.RemoveFixedDeltaTimeConsumer(BlushUpdate);
