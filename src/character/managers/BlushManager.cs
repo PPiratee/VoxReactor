@@ -29,7 +29,7 @@ namespace PPirate.VoxReactor
         private readonly Logger logger;
 
         public BlushManager(VoxtaCharacter character) {
-            logger = new Logger("BlushManager:Char#" + character.characterNumber);
+            logger = new Logger("BlushManager:Char#" + character.characterNumber, 0);
             logger.Constructor();
 
             this.character = character;
@@ -153,7 +153,7 @@ namespace PPirate.VoxReactor
 
             public bool BlushUpdate(float deltaTime)
             {
-
+                //SuperController.LogError("current alpha: "+ clothing.GetFloatParamValue("Alpha Adjust"));
                 float targetAlpha = SimpleLerp(alphaNoBlush, alphaFullBlush, blushManager.blushTarget);
                 float blush1NewAlpha = LerpWithSpeed(interpolationStartingValue, targetAlpha, blushManager.currentSpeed, deltaTime);
 
