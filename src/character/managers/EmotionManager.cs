@@ -69,7 +69,7 @@ namespace PPirate.VoxReactor
 
         public readonly BlushManager blushManager;
         public EmotionManager(VoxtaCharacter character) {
-            logger2 = new Logger("VoxtaCharacter:Char#" + character.characterNumber, 0);
+            logger2 = new Logger("VoxtaCharacter:Char#" + character.characterNumber);
             logger2.Constructor();
             this.character = character;
 
@@ -355,6 +355,7 @@ namespace PPirate.VoxReactor
         }
         protected override void IncreaseOverride(float increment)
         {
+           // SuperController.LogError("over");
             emotionManager.blushManager.SetMinBlush(value);
             emotionManager.blushManager.CancelPendingDeblush();
             emotionManager.blushManager.OnBlush();

@@ -86,7 +86,7 @@ namespace PPirate.VoxReactor
        
        
         private void StartBlushInterpolating() {
-
+            logger.StartMethod("StartBlushInterpolating()");
             clothingItem1.SetTimeInterpolating(0.0f);
             clothingItem2.SetTimeInterpolating(0.0f);
 
