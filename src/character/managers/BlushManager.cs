@@ -29,7 +29,7 @@ namespace PPirate.VoxReactor
         private readonly Logger logger;
 
         public BlushManager(VoxtaCharacter character) {
-            logger = new Logger("BlushManager:Char#" + character.characterNumber, 0);
+            logger = new Logger("BlushManager:Char#" + character.characterNumber);
             logger.Constructor();
 
             this.character = character;

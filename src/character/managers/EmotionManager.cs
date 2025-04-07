@@ -71,7 +71,7 @@ namespace PPirate.VoxReactor
         public readonly BlushManager blushManager;
         public EmotionManager(VoxtaCharacter character) {
             try {
-                logger2 = new Logger("VoxtaCharacter:Char#" + character.characterNumber, 0);
+                logger2 = new Logger("VoxtaCharacter:Char#" + character.characterNumber);
                 logger2.Constructor();
                 this.character = character;
 
