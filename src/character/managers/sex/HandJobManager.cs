@@ -34,7 +34,7 @@ namespace PPirate.VoxReactor
 
         public HandJobManager(VoxtaCharacter character) {
             logger = new Logger("HandJobManager:Char#" + character.characterNumber);
-
+            logger.Constructor();
             this.character = character;
             hjPlugin = character.plugins.hjPlugin;
 
@@ -56,9 +56,9 @@ namespace PPirate.VoxReactor
 
             currentSpeed = SPEED_MEDIUM;
             UpdateSpeed();
-            //hjPlugin.SetIsActive(true);
+            hjPlugin.SetIsActive(true);
             //play hj anim
-            character.plugins.bodyTimeline.PlayArmsDownHj();
+            //character.plugins.bodyTimeline.PlayArmsDownHj();
             character.dirtyTalkManager.StartDirtyTalk(dirtyTalkLines);
         }
         private void ActionHandjobStop()
