@@ -67,6 +67,9 @@ namespace PPirate.VoxReactor
         }
         public void PushFixedDeltaTimeConsumer(Action<float> callback)
         {
+            if (fixedUpdateTimeConsumers.Contains(callback)) {
+                return;
+            }
             fixedUpdateTimeConsumers.Add(callback);
         }
         public void RemoveFixedDeltaTimeConsumer(Action<float> callback) {

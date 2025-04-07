@@ -355,13 +355,15 @@ namespace PPirate.VoxReactor
         }
         protected override void IncreaseOverride(float increment)
         {
-            //emotionManager.blushManager.SetMinBlush(value);
+            emotionManager.blushManager.SetMinBlush(value);
+            emotionManager.blushManager.CancelPendingDeblush();
             emotionManager.blushManager.OnBlush();
 
         }
         protected override void DecreaseOverride(float decrement)
         {
-            //emotionManager.blushManager.SetMinBlush(value);
+            emotionManager.blushManager.SetMinBlush(value);
+            emotionManager.blushManager.LerpToMinBLush();
            // emotionManager.blushManager.OnBlush();
 
         }
