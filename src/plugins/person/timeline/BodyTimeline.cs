@@ -9,30 +9,30 @@ namespace PPirate.VoxReactor
 {
     internal class BodyTimeline
     {
-        private readonly string timelineStorableID = "5_VamTimeline.AtomPlugin";
+        private readonly string timelineStorableID = "4_VamTimeline.AtomPlugin";
         private readonly JSONStorable timelinePlugin;
 
         public BodyTimeline(Atom atom) { 
-            timelinePlugin = AtomUtils.GetReciever(atom, timelineStorableID);
+           // timelinePlugin = AtomUtils.GetReciever(atom, timelineStorableID);
         }
         public void PlayShakeTits() {
-            timelinePlugin.CallAction("Play shake");
+           // timelinePlugin.CallAction("Play shake");
         }
         public void PlayShakeIdle()
         {
-            timelinePlugin.CallAction("Play idle");
+          //  timelinePlugin.CallAction("Play idle");
         }
         public void PlayShowTitsDown()
         {
-            timelinePlugin.CallAction("Play showTitsDown");
+         //   timelinePlugin.CallAction("Play showTitsDown");
         }
         public void PlayTakeOffDress()
         {
-            timelinePlugin.CallAction("Play armsTakeoffDress");
+         //   timelinePlugin.CallAction("Play armsTakeoffDress");
         }
         public void PlayArmsDownHj()
         {
-            timelinePlugin.CallAction("Play armsDownHj");
+          //  timelinePlugin.CallAction("Play armsDownHj");
         }
     }
 }

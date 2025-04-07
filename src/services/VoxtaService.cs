@@ -33,9 +33,13 @@ namespace PPirate.VoxReactor
                 logger.StartMethod("Constructor");
 
                 VoxtaService.singleton = this;
+
                 this.main = main;
                 this.voxtaPlugin = voxtaPlugin;
+
+
                 this.userName = voxtaPlugin.GetUserName();//todo may want to wait util chat is active.
+      
                 voxtaPlugin.setActionConsumer(VoxtaActionConsumer);
                 voxtaPlugin.setStateConsumer(VoxtaStateConsumer);
 
@@ -43,6 +47,7 @@ namespace PPirate.VoxReactor
                 AddChild(voxtaContextService);
                 globalObserverRegistry = new ObserverRegistry();
                 conversationService = new ConversationService(this);
+                
 
                 SetUpCharacters();
 
@@ -51,7 +56,9 @@ namespace PPirate.VoxReactor
             } catch(Exception e) {
                 logger.ERR("FAILURE during VoxtaService Constructor: " + e.Message);
             }
+            
         }
+
         private void SetUpCharacters() {
             logger.StartMethod("SetUpCharacters()");
             string char1Name = voxtaPlugin.GetCharacterName(1);

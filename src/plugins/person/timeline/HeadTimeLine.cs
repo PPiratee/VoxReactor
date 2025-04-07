@@ -10,7 +10,7 @@ namespace PPirate.VoxReactor
     internal class HeadTimeLine
     {
 
-        private readonly String timelineStorableID = "11_VamTimeline.AtomPlugin";
+        private readonly String timelineStorableID = "10_VamTimeline.AtomPlugin";
         private readonly JSONStorable timelinePlugin;
 
         public HeadTimeLine(VoxtaCharacter character)
