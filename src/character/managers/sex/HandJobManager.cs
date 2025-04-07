@@ -33,7 +33,7 @@ namespace PPirate.VoxReactor
 
 
         public HandJobManager(VoxtaCharacter character) {
-            logger = new Logger("HandJobManager:Char#" + character.characterNumber, 0);
+            logger = new Logger("HandJobManager:Char#" + character.characterNumber);
             logger.Constructor();
             this.character = character;
             hjPlugin = character.plugins.hjPlugin;
