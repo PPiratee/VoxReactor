@@ -55,7 +55,7 @@ namespace PPirate.VoxReactor
             currentDirtyTalkLInes = new List<string>();
             foreach (String line in globalDirtyTalkLines)
             {
-                currentDirtyTalkLInes.Add(line);
+               // currentDirtyTalkLInes.Add(line);
             }
             foreach (String line in lines)
             {

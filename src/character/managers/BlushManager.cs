@@ -43,6 +43,7 @@ namespace PPirate.VoxReactor
         private bool pendingDeBlush = false;
         private bool isBLushing = false;
         public void OnBlush() {
+           
             logger.StartMethod("OnBlush()");
             if (isBLushing) {
                 return;
@@ -71,6 +72,7 @@ namespace PPirate.VoxReactor
         
 
         public void BlushUpdate(float deltaTime) {
+           // SuperController.LogError("interpoalting");
             bool isDone = clothingItem1.BlushUpdate(deltaTime);
             bool isDone2 = clothingItem2.BlushUpdate(deltaTime);
 
