@@ -7,7 +7,7 @@ using PPirate.VoxReactormanagers;
 
 namespace PPirate.VoxReactor
 {
-    internal class VoxtaCharacter
+    internal class VoxtaCharacter : SafeMvr
     {
 
 
@@ -31,7 +31,6 @@ namespace PPirate.VoxReactor
         public readonly TouchManager touchManager;
         public readonly LookingAtManager lookingAtManager;
         public readonly SexManager sexManager;
-        public readonly HornyManager hornyManager;
         public readonly DirtyTalkManager dirtyTalkManager;
         public readonly ShakeManager shakeManager;
         public readonly BlowJobManager blowjobManager;
@@ -47,8 +46,6 @@ namespace PPirate.VoxReactor
         private Logger logger;
         public VoxtaCharacter(int characterNumber, string name, Atom atom, Main main, VoxtaService voxtaService)
         {
-
-            
             try
             {
 
@@ -73,7 +70,7 @@ namespace PPirate.VoxReactor
                 touchManager = new TouchManager(this);
                 lookingAtManager = new LookingAtManager(this);
                 sexManager = new SexManager(this);
-                hornyManager = new HornyManager(this);
+                AddChild(sexManager);
                 dirtyTalkManager = new DirtyTalkManager(this);
                 shakeManager = new ShakeManager(this);
                 blowjobManager = new BlowJobManager(this);

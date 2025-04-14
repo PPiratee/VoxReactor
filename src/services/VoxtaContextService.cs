@@ -10,6 +10,7 @@ namespace PPirate.VoxReactor
 {
     internal class VoxtaContextService : SafeMvr
     {
+        public static VoxtaContextService singleton;
         private readonly VoxtaPlugin voxtaPlugin;
 
 
@@ -25,6 +26,8 @@ namespace PPirate.VoxReactor
                 RefreshContext();
             });
             Main.singleton.RegisterAction(OnRefreshContext);
+
+            VoxtaContextService.singleton = this;
         }
         private List<string> contextItems = new List<string>();
         private List<string> queuedItems = new List<string>();

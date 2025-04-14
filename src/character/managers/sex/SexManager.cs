@@ -6,7 +6,7 @@ using SimpleJSON;
 
 namespace PPirate.VoxReactor
 {
-    internal class SexManager
+    internal class SexManager : SafeMvr
     {
         VoxtaCharacter character;
         
@@ -16,10 +16,13 @@ namespace PPirate.VoxReactor
 
         public HandJobManager handJobManager;
         public ReadMyLipsPlugin readMyLipsPlugin;
+        public StimulationManager stimulationManager;
         public SexManager(VoxtaCharacter character) {
             this.character = character;
             handJobManager = new HandJobManager(character);
             readMyLipsPlugin = character.plugins.readMyLipsPlugin;
+            stimulationManager = new StimulationManager(character);
+            AddChild(stimulationManager);
 
             OnUserCum = new JSONStorableAction("OnUserCum", OnUserCumCallback);//todo should be service
             character.main.RegisterAction(OnUserCum);

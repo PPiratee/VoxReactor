@@ -65,9 +65,9 @@ namespace PPirate.VoxReactor
           
             if (char1Name != null)
             {
-              
-
-                characters.Add(new VoxtaCharacter(1, char1Name, voxtaPlugin.GetChar1Atom(), main, this));//todo get atom from voxta plugin
+                var character = new VoxtaCharacter(1, char1Name, voxtaPlugin.GetChar1Atom(), main, this);
+                AddChild(character);
+                characters.Add(character);//todo get atom from voxta plugin
                 
             }
             /*
