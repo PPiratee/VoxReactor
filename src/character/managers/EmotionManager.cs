@@ -344,7 +344,7 @@ namespace PPirate.VoxReactor
     }
     internal class Happyness : Emotion {
         
-        public Happyness(EmotionManager emotionManager) : base(emotionManager, "happy", 30f) {
+        public Happyness(EmotionManager emotionManager) : base(emotionManager, "happy", 40f) {
             
         }
         protected override void IncreaseOverride(float increment) { 
@@ -408,7 +408,7 @@ namespace PPirate.VoxReactor
     internal class Embarrassment : Emotion
     {
 
-        public Embarrassment(EmotionManager emotionManager) : base(emotionManager, "embarrassed", 0f)
+        public Embarrassment(EmotionManager emotionManager) : base(emotionManager, "embarrassed", 35f)
         {
             this.isNegativeEmotion = true;
         }
@@ -435,7 +435,7 @@ namespace PPirate.VoxReactor
     internal class Hornieness : Emotion
     {
 
-        public Hornieness(EmotionManager emotionManager) : base(emotionManager, "horny", 0f)
+        public Hornieness(EmotionManager emotionManager) : base(emotionManager, "horny", 20f)
         {
 
         }

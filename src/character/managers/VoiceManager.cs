@@ -48,7 +48,7 @@ namespace PPirate.VoxReactor
             //todo who are you speaking to?
             
             gazeManager.LookAtPlayer();
-            float talkingHeadBobDelay = 1f;
+            float talkingHeadBobDelay = 0f;
             AtomUtils.RunAfterDelay(talkingHeadBobDelay,() => { 
                 headTimeLine.Talk();
                 

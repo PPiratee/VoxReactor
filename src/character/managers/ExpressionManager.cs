@@ -22,11 +22,17 @@ namespace PPirate.VoxReactormanagers
             }
             lastMood = mood;
 
-            expressionPlugin.StopAll();
-            AtomUtils.RunAfterDelay(1f, ()=> {
-                expressionPlugin.LoadMood(mood);
-                expressionPlugin.StartAll();
-            });
+           // expressionPlugin.StopAll();
+            expressionPlugin.LoadMood(mood);
+
+           // AtomUtils.RunAfterDelay(1f, ()=> {
+               // expressionPlugin.LoadMood(mood);
+               // expressionPlugin.StartAll();
+           // });
+            //AtomUtils.RunAfterDelay(5f, () => {
+                //expressionPlugin.LoadMood(mood);
+               // expressionPlugin.StartAll();
+          //  });
         }
     }
 }
