@@ -45,7 +45,11 @@ namespace PPirate.VoxReactor
         {
             return plugin.GetFloatJSONParam("Stimulation").val;
         }
-      
+        public JSONStorableFloat GetOrgasmThreshold()
+        {
+            return plugin.GetFloatJSONParam("Orgasm Threshold");
+        }
+        //Orgasm Threshold
 
 
     }

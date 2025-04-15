@@ -11,9 +11,10 @@ namespace PPirate.VoxReactor
         private readonly Logger logger;
         private float stimulation;
 
+        private float orgasmThreshold = 0.95f;
         private bool isHavingOrgasm = false;
         private bool isOnCuspOfOrgasm = false;
-        private float orgasmCuspThreshold = 0.9f;
+        private float orgasmCuspThreshold = 0.82f;
         private string contextItem = null;
 
         private readonly ReadMyLipsPlugin readMyLipsPlugin;
@@ -24,25 +25,9 @@ namespace PPirate.VoxReactor
             try
             {
                 logger.StartMethod("Constructor");
-                character.main.RegisterAction(
-                    new JSONStorableAction("Char#" + character.characterNumber + "OnOrgasmStart"
-                        , OnOrgasmStart)
-                );
 
-                character.main.RegisterAction(
-                    new JSONStorableAction("Char#" + character.characterNumber + "OnOrgasmStop"
-                        , OnOrgasmStop)
-                );
-
-                character.main.RegisterAction(
-                    new JSONStorableAction("TESTESTSET"
-                        , TEST)
-                );
                 this.readMyLipsPlugin = character.plugins.readMyLipsPlugin;
-                //todo add safe mvr callback 
-                // var action = character.plugins.readMyLipsPlugin.GetCharacterOrgasmNowAction();
-                AddCallback(readMyLipsPlugin.GetCharacterOrgasmNowAction(),
-                    OnOrgasmStart);
+
 
                 AddCallback(readMyLipsPlugin.GetStimulationStorable(),
                    OnStimulationChange);
@@ -58,7 +43,7 @@ namespace PPirate.VoxReactor
         {
             logger.ERR("OnOrgasmStart()");
             logger.StartMethod("OnOrgasmStart()");
-            character.voxtaService.SendEventNow(character.name + " starts to have an orgasm");
+            character.voxtaService.SendEventNow(character.name + " starts to have an orgasm. She will say as much:");
 
             
         }
@@ -69,33 +54,47 @@ namespace PPirate.VoxReactor
 
             character.voxtaService.SendEventNow(character.name + " just had an orgasm. " + character.name + " will tell {{user}} about it");
         }
-        private void TEST()
-        {
-            logger.StartMethod("TEST()");
-
-           // character.plugins.readMyLipsPlugin.todo();
-
-
-
-        }
+  
         private void OnStimulationChange(float stimulation) { 
             this.stimulation = stimulation;
             ClampStimulation();
-            bool sendOrgasmCusp = OrgasmCuspCheck();
+            bool sendOrgasmEvent = OrgasmCheck();
+            bool sendOrgasmCuspEvent = false;
+            if (!sendOrgasmEvent) { 
+                sendOrgasmCuspEvent = OrgasmCuspCheck();
+            }
+
             UpdateContext();
-            if (sendOrgasmCusp) {
+
+            if (sendOrgasmEvent) {
+                OnOrgasmStart();
+            }
+            else if (sendOrgasmCuspEvent) {
                 VoxtaPlugin.singleton.SendEvent(character.name + " is about to have an orgasm. She will say as much:");
             }
         }
+        private bool OrgasmCheck()
+        {
+            if (!isHavingOrgasm && stimulation >= readMyLipsPlugin.GetOrgasmThreshold().val)
+            { //now on cusp of orgasm
+                isHavingOrgasm = true;
+                return true;
+            }
+          
+            return false;
+        }
         private bool OrgasmCuspCheck() {
-            if(!isOnCuspOfOrgasm && stimulation >= orgasmCuspThreshold) { //now on cusp of orgasm
+            if(!isHavingOrgasm && !isOnCuspOfOrgasm && stimulation >= orgasmCuspThreshold) { //now on cusp of orgasm
                 isOnCuspOfOrgasm = true;
                 return true;
             }
-            if (isOnCuspOfOrgasm && stimulation < orgasmCuspThreshold) // no longer on cusp of orgasm
-            {
-                isOnCuspOfOrgasm = false;
+            if (stimulation < orgasmCuspThreshold) {
+                if (isOnCuspOfOrgasm) {
+                    isOnCuspOfOrgasm = false;
+                }
+                isHavingOrgasm = false;
             }
+            
             return false;
         }
         private void ClampStimulation() {
@@ -119,7 +118,7 @@ namespace PPirate.VoxReactor
 
             string newContextItem = string.Format("{0}'s sexual stimulation level: {1}%", character.name, stimPercent);
             if (isHavingOrgasm) {
-                newContextItem += "She is currently having an orgasm.";
+                newContextItem += "(Currently having an orgasm)";
             }
             else if (isOnCuspOfOrgasm) {
                 newContextItem += "(On cusp of an orgasm)";
