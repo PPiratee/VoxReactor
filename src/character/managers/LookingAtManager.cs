@@ -17,13 +17,18 @@ namespace PPirate.VoxReactor
         private readonly String VOX_ACTION_BATT_EYES = "batt_eyes_char";
         private readonly String VOX_ACTION_WINK = "wink_char";
 
-        public LookingAtManager(VoxtaCharacter character) { 
+        private readonly Logger logger;
+
+        public LookingAtManager(VoxtaCharacter character) {
+            logger = new Logger("VoxtaCharacter:Char#" + character.characterNumber);
+            logger.Constructor();
             this.character = character;
             OnLookAtTits = new JSONStorableAction("Char#"+ character.characterNumber+"OnLookAtTits", OnLookAtTitsCallback);
             character.main.RegisterAction(OnLookAtTits);
 
             character.actionObserverRegistry.RegisterObserver(VOX_ACTION_BATT_EYES + character.characterNumber, OnBattEyes);
             character.actionObserverRegistry.RegisterObserver(VOX_ACTION_WINK + character.characterNumber, Wink);
+            character.stateManager.observerRegistry.RegisterObserver(StateManager.REGISTRY_STOP_SPEAKING, OnSpeakingStop);
 
         }
         public void OnLookAtTitsCallback()
@@ -78,14 +83,26 @@ namespace PPirate.VoxReactor
 
             }
         }
+        private bool pendingWink = false;
         private void Wink()
         {
-            character.plugins.glancePlugin.SetBlinkEnabled(false);
-            character.plugins.headTimeLine.PlayWink();
-            AtomUtils.RunAfterDelay(1f, () => { 
-                character.plugins.glancePlugin.SetBlinkEnabled(true);
-            });
+            logger.StartMethod("Wink()");
+            pendingWink = true;
+        }
 
+        private void OnSpeakingStop()
+        {
+            logger.StartMethod("OnSpeakingStop()");
+            
+            if (pendingWink)
+            {
+                pendingWink = false;
+                character.plugins.glancePlugin.SetBlinkEnabled(false);
+                character.plugins.headTimeLine.PlayWink();
+                AtomUtils.RunAfterDelay(1f, () => {
+                    character.plugins.glancePlugin.SetBlinkEnabled(true);
+                });
+            }
         }
     }
 }
