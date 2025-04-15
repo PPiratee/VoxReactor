@@ -21,7 +21,7 @@ namespace PPirate.VoxReactor
         public StimulationManager(VoxtaCharacter character) { 
             this.character = character;
 
-            logger = new Logger("OrgasmManager:Char#" + character.characterNumber, 0);
+            logger = new Logger("OrgasmManager:Char#" + character.characterNumber);
             try
             {
                 logger.StartMethod("Constructor");
