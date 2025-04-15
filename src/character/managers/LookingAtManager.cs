@@ -13,10 +13,18 @@ namespace PPirate.VoxReactor
         private bool canLookAtTits = true;
         public JSONStorableAction OnLookAtTits;
         private float lookAtTitsCooldown = 40;
+
+        private readonly String VOX_ACTION_BATT_EYES = "batt_eyes_char";
+        private readonly String VOX_ACTION_WINK = "wink_char";
+
         public LookingAtManager(VoxtaCharacter character) { 
             this.character = character;
-            OnLookAtTits = new JSONStorableAction("OnLookAtTits", OnLookAtTitsCallback);
+            OnLookAtTits = new JSONStorableAction("Char#"+ character.characterNumber+"OnLookAtTits", OnLookAtTitsCallback);
             character.main.RegisterAction(OnLookAtTits);
+
+            character.actionObserverRegistry.RegisterObserver(VOX_ACTION_BATT_EYES + character.characterNumber, OnBattEyes);
+            character.actionObserverRegistry.RegisterObserver(VOX_ACTION_WINK + character.characterNumber, Wink);
+
         }
         public void OnLookAtTitsCallback()
         {
@@ -37,6 +45,47 @@ namespace PPirate.VoxReactor
         {
             yield return new WaitForSeconds(lookAtTitsCooldown);
             canLookAtTits = true;
+        }
+        int batMinBlink = 3;
+        int batMaxBlink = 5;
+        int timesToBlink;
+        int timesBlinked = 0;
+
+        float timeBetweenBatts = 0.26f;
+
+        public void OnBattEyes() {
+            SuperController.LogError("BATTS EYES");
+            character.plugins.glancePlugin.SetBlinkEnabled(false);
+            timesToBlink = UnityEngine.Random.Range(batMinBlink, batMaxBlink + 1);
+            timesBlinked = 0;
+            for (int i = 0; i < timesToBlink; i++)
+            {
+                AtomUtils.RunAfterDelay(i * timeBetweenBatts, Blink);
+            }
+
+
+        }
+        private void Blink() {
+            timesBlinked++;
+            SuperController.LogError("timesToBlink" + timesToBlink);
+
+
+            SuperController.LogError("TimesBlinked" + timesBlinked);
+
+            character.plugins.glancePlugin.BlinkNow();
+            if (timesBlinked == timesToBlink) { 
+                character.plugins.glancePlugin.SetBlinkEnabled(true);
+
+            }
+        }
+        private void Wink()
+        {
+            character.plugins.glancePlugin.SetBlinkEnabled(false);
+            character.plugins.headTimeLine.PlayWink();
+            AtomUtils.RunAfterDelay(1f, () => { 
+                character.plugins.glancePlugin.SetBlinkEnabled(true);
+            });
+
         }
     }
 }

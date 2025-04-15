@@ -28,6 +28,10 @@ namespace PPirate.VoxReactor
             timelinePlugin.CallAction("Play idle");
         }
 
+        public void PlayWink() {
+            timelinePlugin.CallAction("Play wink");
+        }
+
 
     }
 }
