@@ -26,7 +26,7 @@ namespace PPirate.VoxReactor
 
         public readonly StateManager stateManager;
         public readonly EmotionManager emotionManager;
-        public readonly GazeManager gazeManager;
+        public readonly GazeManager gazeManager;  
         public readonly VoiceManager voiceManager;
         public readonly TouchManager touchManager;
         public readonly LookingAtManager lookingAtManager;
@@ -43,7 +43,7 @@ namespace PPirate.VoxReactor
 
 
 
-        private Logger logger;
+        private readonly Logger logger;
         public VoxtaCharacter(int characterNumber, string name, Atom atom, Main main, VoxtaService voxtaService)
         {
             try
