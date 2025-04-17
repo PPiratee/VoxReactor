@@ -17,9 +17,11 @@ namespace PPirate.VoxReactor
 
         private readonly JSONStorableString ClothDescription;
         private readonly JSONStorableString ClothAtomName;
+        private readonly Logger logger = new Logger("ClothingService", 0);
 
         public ClothingService(Main main, VoxtaService voxtaService, VoxtaContextService contextService)
         {
+            logger.Constructor();
             this.voxtaService = voxtaService;
             this.contextService = contextService;
 
@@ -42,15 +44,19 @@ namespace PPirate.VoxReactor
         Dictionary<string, List<string>> map = new Dictionary<string, List<string>>();
         public void OnAddClothCallback()
         {
+            logger.StartMethod("OnAddClothCallback()");
             if (ShouldSkip()) {
+                logger.DEBUG("Skiped Adding");
                 return;
             }
             voxtaService.getCharacterByAtomName(ClothAtomName.val)
                 .clothingManager.OnAdd(ClothDescription.val);
         }
         public void OnRemoveClothCallback() {
+            logger.StartMethod("OnRemoveClothCallback()");
             if (ShouldSkip())
             {
+                logger.DEBUG("Skiped removing");
                 return;
             }
             voxtaService.getCharacterByAtomName(ClothAtomName.val)
@@ -60,16 +66,26 @@ namespace PPirate.VoxReactor
         String oldContextItem = "";
 
         public void UpdateClothingContext() {
+            logger.StartMethod("UpdateClothingContext()");
+
             String contextItem = "";
             VoxtaService.singleton.characters.ForEach(character =>
             {
+                logger.DEBUG("getting clothing context for " + character.name);
+
                 contextItem += character.clothingManager.GetContext();
+                logger.DEBUG("after getting clothing context for " + character.name);
             });
 
-            if (oldContextItem != "") { 
+            if (contextItem != "")
+            {
+                logger.DEBUG("adding context item");
                 contextService.RemoveContextItem(oldContextItem);
                 contextService.AddContextItem(contextItem);
                 oldContextItem = contextItem;
+            }
+            else {
+                logger.DEBUG("new context is empty!");
             }
         }
         private bool ShouldSkip() {

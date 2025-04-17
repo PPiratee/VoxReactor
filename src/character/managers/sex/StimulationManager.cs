@@ -11,7 +11,6 @@ namespace PPirate.VoxReactor
         private readonly Logger logger;
         private float stimulation;
 
-        private float orgasmThreshold = 0.95f;
         private bool isHavingOrgasm = false;
         private bool isOnCuspOfOrgasm = false;
         private float orgasmCuspThreshold = 0.82f;

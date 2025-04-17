@@ -24,7 +24,7 @@ namespace PPirate.VoxReactor
 
         public ClothingManager(VoxtaCharacter character)
         {
-            logger = new Logger("ClothingManager:Char#" + character.characterNumber);
+            logger = new Logger("ClothingManager:Char#" + character.characterNumber, 0);
 
             this.character = character;
             
@@ -34,6 +34,7 @@ namespace PPirate.VoxReactor
             logger.DEBUG("OnAdd: " + clothDescription);
             if (clothDescription != "" &&  clothingDescriptions.Contains(clothDescription))
             {
+                logger.DEBUG("Already put clothing item on");
                 return;
             }
             clothingDescriptions.Add(clothDescription);
@@ -74,6 +75,7 @@ namespace PPirate.VoxReactor
             }
 
             context = newContext;
+            logger.DEBUG("New context is:" + newContext);
         }
         private string getStartOfContext() {
             if (clothingDescriptions.Count > 1) {
