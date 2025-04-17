@@ -20,6 +20,9 @@ namespace PPirate.VoxReactor
 
         public JSONStorableAction OnNarrateThoughts;
 
+        private readonly String VOX_ACTION_GIGGLE = "giggle_char";
+
+
 
         public VoiceManager(VoxtaCharacter character) {
             logger = new Logger("VoiceManager:Char#" + character.characterNumber);
@@ -31,6 +34,8 @@ namespace PPirate.VoxReactor
 
             character.stateManager.observerRegistry.RegisterObserver(StateManager.REGISTRY_START_SPEAKING, OnSpeaking);
             character.stateManager.observerRegistry.RegisterObserver(StateManager.REGISTRY_STOP_SPEAKING, OnSpeakingStop);
+            character.actionObserverRegistry.RegisterObserver(VOX_ACTION_GIGGLE + character.characterNumber, OnGiggle);
+
 
             OnNarrateThoughts = new JSONStorableAction("OnNarrateThoughts", OnNarrateThoughtsCallback);
             character.main.RegisterAction(OnNarrateThoughts);
@@ -70,6 +75,11 @@ namespace PPirate.VoxReactor
             }
             StopSpeakingHelper();
             isNarratingThoughts = false;
+
+            if (pendingGiggle) {
+                pendingGiggle = false;
+                Giggle();
+            }
         }
         public void SetCharacterCanSpeak(bool canSpeak) {
             character.voxtaService.SetCharacterCanSpeak(canSpeak);
@@ -86,6 +96,29 @@ namespace PPirate.VoxReactor
         private void OnNarrateThoughtsCallback() { //todo work with multiple characters
             isNarratingThoughts = true;
             character.voxtaService.TriggerCommand("thoughts");
+        }
+
+        private bool pendingGiggle = false;
+        private void OnGiggle() {
+            pendingGiggle = true;
+        }
+        System.Random random = new System.Random();
+        private static List<string> laughLines = new List<string>() { 
+            "hehe!",
+            "he he!",
+            "tihi!",
+            "haha!",
+            "ha ha!",
+            "hah hah!",
+            "hah!"
+
+        };
+        private void Giggle() {
+            //todod request character speech does not define which character
+
+            int randomIndex = random.Next(laughLines.Count);
+            string randomItem = laughLines[randomIndex];
+            VoxtaPlugin.singleton.RequestCharacterSpeech(randomItem);
         }
     }
 

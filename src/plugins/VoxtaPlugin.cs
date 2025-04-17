@@ -10,6 +10,7 @@ namespace PPirate.VoxReactor
 {
     internal class VoxtaPlugin : SafeMvr
     {
+        public static VoxtaPlugin singleton;
         private readonly Main main;
         private readonly Logger logger = new Logger("VoxtaPlugin");
 
@@ -22,7 +23,7 @@ namespace PPirate.VoxReactor
 
         public VoxtaPlugin(Main main, JSONStorable voxtaStorable)
         {
-
+            singleton = this;
             this.main = main;
            // this.logger = logger;
            // this.actionConsumer = actionConsumer;

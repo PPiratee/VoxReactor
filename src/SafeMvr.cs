@@ -67,7 +67,21 @@ namespace PPirate.VoxReactor
             callBacks.Add(newCallback);
             return newCallback;
         }
-        
+
+        public ActionCallback AddCallback(JSONStorableAction jsonParam, Action callbackDelegate)
+        {
+            var newCallback = new ActionCallback(jsonParam, new JSONStorableAction.ActionCallback(callbackDelegate));
+            callBacks.Add(newCallback);
+            return newCallback;
+        }
+
+        public FloatCallback AddCallback(JSONStorableFloat jsonParam, Action<float> callbackDelegate)
+        {
+            var newCallback = new FloatCallback(jsonParam, new JSONStorableFloat.SetFloatCallback(callbackDelegate));
+            callBacks.Add(newCallback);
+            return newCallback;
+        }
+
 
         public class BoolCallback : IClearable
         {
@@ -115,6 +129,40 @@ namespace PPirate.VoxReactor
             public void Clear()
             {
                 jsonParam.setCallbackFunction -= setStringCallback;
+
+            }
+        }
+        public class ActionCallback : IClearable
+        {
+            private readonly JSONStorableAction jsonParam;
+            private readonly JSONStorableAction.ActionCallback callback;
+            public ActionCallback(JSONStorableAction jsonParam, JSONStorableAction.ActionCallback callback)
+            {
+                this.jsonParam = jsonParam;
+                this.callback = callback;
+                jsonParam.actionCallback += callback;
+            }
+
+            public void Clear()
+            {
+                jsonParam.actionCallback -= callback;
+
+            }
+        }
+        public class FloatCallback : IClearable
+        {
+            private readonly JSONStorableFloat jsonParam;
+            private readonly JSONStorableFloat.SetFloatCallback callback;
+            public FloatCallback(JSONStorableFloat jsonParam, JSONStorableFloat.SetFloatCallback callback)
+            {
+                this.jsonParam = jsonParam;
+                this.callback = callback;
+                jsonParam.setCallbackFunction += callback;
+            }
+
+            public void Clear()
+            {
+                jsonParam.setCallbackFunction -= callback;
 
             }
         }

@@ -9,12 +9,12 @@ src\character\managers\TouchManager.cs
 src\character\managers\LookingAtManager.cs
 src\character\managers\ClothingManager.cs
 src\character\managers\ExpressionManager.cs
-src\character\managers\sex\HornyManager.cs
 src\character\managers\sex\SexManager.cs
 src\character\managers\sex\HandJobManager.cs
 src\character\managers\sex\BlowJobManager.cs
 src\character\managers\sex\DirtyTalkManager.cs
 src\character\managers\sex\ShakeManager.cs
+src\character\managers\sex\StimulationManager.cs
 src\character\events\EventShowTits.cs
 src\character\VoxtaCharacter.cs
 src\character\VoiceLines.cs

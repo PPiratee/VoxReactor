@@ -11,26 +11,45 @@ namespace PPirate.VoxReactor
         VoxtaCharacter character;
 
         private readonly String readMyLipsPluginStorableID = "CheesyFX.ReadMyLips";
-        private readonly JSONStorable readMyLipsPlugin;
+        private readonly JSONStorable plugin;
 
         public ReadMyLipsPlugin(VoxtaCharacter character) { 
             this.character = character;
 
-            readMyLipsPlugin = AtomUtils.GetReciever(character.atom, readMyLipsPluginStorableID);
+            plugin = AtomUtils.GetReciever(character.atom, readMyLipsPluginStorableID);
         }
 
         public void SetMoansEnabled(bool val) {
-            readMyLipsPlugin.SetBoolParamValue("Voice Enabled", val);
+            plugin.SetBoolParamValue("Voice Enabled", val);
         }
 
         public bool GetMoansEnabled()
         {
-            return readMyLipsPlugin.GetBoolParamValue("Voice Enabled");
+            return plugin.GetBoolParamValue("Voice Enabled");
         }
 
         public void OrgasmDildosNow() {
-            readMyLipsPlugin.CallAction("Orgasm Dildos Now");
+            plugin.CallAction("Orgasm Dildos Now");
         }
+        public void CharacterOrgasmNow() {
+            plugin.CallAction("Orgasm Now");
+        }
+        public JSONStorableAction GetCharacterOrgasmNowAction()
+        {
+            return plugin.GetAction("Orgasm Now");
+        }
+        public JSONStorableFloat GetStimulationStorable() {
+            return plugin.GetFloatJSONParam("Stimulation");
+        }
+        public float GetStimulationValue()
+        {
+            return plugin.GetFloatJSONParam("Stimulation").val;
+        }
+        public JSONStorableFloat GetOrgasmThreshold()
+        {
+            return plugin.GetFloatJSONParam("Orgasm Threshold");
+        }
+        //Orgasm Threshold
 
 
     }

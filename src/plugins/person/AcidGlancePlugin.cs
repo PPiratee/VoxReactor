@@ -38,5 +38,13 @@ namespace PPirate.VoxReactor
             glancePlugin.SetStringChooserParamValue("Presets", GLANCE_PRESET_DEFAULT);
 
         }
+        public void SetBlinkEnabled(bool enabled) { 
+            glancePlugin.GetBoolJSONParam("BlinkEnabled").val = enabled;
+        }
+        public void BlinkNow()
+        {
+            glancePlugin.CallAction("BlinkNow");
+
+        }
     }
 }
