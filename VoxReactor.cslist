@@ -60,4 +60,4 @@ src\config\ConfigVoxReactor.cs
 src\config\ConfigInstanceStorable.cs
 src\config\character\ConfigCharacterBase.cs
 src\config\character\ConfigCharacterClothing.cs
-src\config\character\ConfigCharacterEmotion.cs
+src\config\character\ConfigCharacterEmotions.cs

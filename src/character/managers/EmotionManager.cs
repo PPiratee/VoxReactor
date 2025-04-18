@@ -114,7 +114,7 @@ namespace PPirate.VoxReactor
 
                 blushManager = new BlushManager(character);
 
-                ConfigCharacterEmotion emotionConfig = ConfigVoxReactor.singeton.GetCharacterConfig(character).emotionConfig;
+                ConfigCharacterEmotions emotionConfig = ConfigVoxReactor.singeton.GetCharacterConfig(character).emotionConfig;
 
                 AddCallback(emotionConfig.emotionsEnabled, EmotionsEnabledToggle);
                 

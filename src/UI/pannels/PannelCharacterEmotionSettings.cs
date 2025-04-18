@@ -7,8 +7,8 @@ namespace PPirate.VoxReactor
         private readonly VoxtaCharacter character;
         
 
-        private readonly ConfigCharacterEmotion emotionConfig;
-        public PannelCharacterEmotionSettings(UIPannel parentPannel, VoxtaCharacter character, ConfigCharacterEmotion emotionConfig) : base("Emotion", parentPannel)
+        private readonly ConfigCharacterEmotions emotionConfig;
+        public PannelCharacterEmotionSettings(UIPannel parentPannel, VoxtaCharacter character, ConfigCharacterEmotions emotionConfig) : base("Emotion", parentPannel)
         { 
             this.character = character;
             this.emotionConfig = emotionConfig;
