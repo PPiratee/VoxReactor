@@ -55,7 +55,9 @@ src\UI\pannels\PannelCharacters.cs
 src\UI\pannels\PannelCharacter.cs
 src\UI\pannels\SubSubMenu.cs
 src\UI\pannels\PannelCharacterClothingSettings.cs
+src\UI\pannels\PannelCharacterEmotionSettings.cs
 src\config\ConfigVoxReactor.cs
 src\config\ConfigInstanceStorable.cs
 src\config\character\ConfigCharacterBase.cs
 src\config\character\ConfigCharacterClothing.cs
+src\config\character\ConfigCharacterEmotion.cs
