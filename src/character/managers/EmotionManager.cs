@@ -11,9 +11,11 @@ using System.CodeDom;
 
 namespace PPirate.VoxReactor
 {
-    internal class EmotionManager
+    internal class EmotionManager: SafeMvr
     {
         private Logger logger2;
+
+        private bool emotionsEnabled = true;
 
 
         private readonly int incrementHorny = 10;
@@ -50,9 +52,6 @@ namespace PPirate.VoxReactor
 
 
 
-       // private readonly String VOX_ACTION_EMOTE_HAPPY = "emote_happy";
-       // private readonly String VOX_ACTION_EMOTE_BLUSH = "emote_embarrased";
-       // private readonly String VOX_ACTION_EMOTE_HORNY = "emote_horny";
 
         public readonly ObserverRegistry emotionObserverRegistry;
 
@@ -115,10 +114,9 @@ namespace PPirate.VoxReactor
 
                 blushManager = new BlushManager(character);
 
+                ConfigCharacterEmotion emotionConfig = ConfigVoxReactor.singeton.GetCharacterConfig(character).emotionConfig;
 
-                //  character.actionObserverRegistry.RegisterObserver(VOX_ACTION_EMOTE_HAPPY, EmoteHappy);
-                // character.actionObserverRegistry.RegisterObserver(VOX_ACTION_EMOTE_BLUSH, EmoteBlush);
-                //  character.actionObserverRegistry.RegisterObserver(VOX_ACTION_EMOTE_HORNY, EmoteHorny);
+                AddCallback(emotionConfig.emotionsEnabled, EmotionsEnabledToggle);
                 
 
                 UpdateContext(null);
@@ -128,6 +126,15 @@ namespace PPirate.VoxReactor
                 SuperController.LogError("EmotionManager constructor failure: " + e.Message);
             }
             
+        }
+        private void  EmotionsEnabledToggle(bool enableEmotions) {
+            if (emotionsEnabled && !enableEmotions) { 
+                DisableContext();
+            } else if (!emotionsEnabled && enableEmotions)
+            {
+                EnableContext();
+            }
+            emotionsEnabled = enableEmotions;
         }
     
         private void OnHornyIncreaseCallback() {
@@ -245,6 +252,12 @@ namespace PPirate.VoxReactor
             character.voxtaService.voxtaContextService.AddContextItem(context);
             lastContextItem = context;
             DebugLogEmotions();
+        }
+        private void EnableContext() {
+            character.voxtaService.voxtaContextService.AddContextItem(lastContextItem);
+        }
+        private void DisableContext() {
+            character.voxtaService.voxtaContextService.RemoveContextItem(lastContextItem);
         }
         private void DebugLogEmotions() {
             string logMsg = String.Empty;

@@ -25,7 +25,7 @@ namespace PPirate.VoxReactor
         private PannelMain mainPannel;       
 
         private ConfigVoxReactor config;
-        public ConfigVoxReactor Config => config;
+        internal ConfigVoxReactor Config => config;
 
 
        // private JSONStorable voxtaStorable = null;

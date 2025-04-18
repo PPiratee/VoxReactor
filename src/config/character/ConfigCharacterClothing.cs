@@ -2,7 +2,7 @@
 
 namespace PPirate.VoxReactor
 {
-    public class ConfigCharacterClothing: ConfigInstanceStorable
+    internal class ConfigCharacterClothing: ConfigInstanceStorable
     {
         public readonly JSONStorableBool clothingContextEnabled;
         public ConfigCharacterClothing(MVRScript mVRScript, ConfigInstanceStorable parent): base(parent) {

@@ -2,7 +2,7 @@
 
 namespace PPirate.VoxReactor
 {
-    public class ConfigCharacterEmotion : ConfigInstanceStorable
+    internal class ConfigCharacterEmotion : ConfigInstanceStorable
     {
         public readonly JSONStorableBool emotionsEnabled;
         public ConfigCharacterEmotion(MVRScript mVRScript, ConfigInstanceStorable parent): base(parent) {
