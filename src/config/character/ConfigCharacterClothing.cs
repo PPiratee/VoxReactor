@@ -5,9 +5,9 @@ namespace PPirate.VoxReactor
     internal class ConfigCharacterClothing: ConfigInstanceStorable
     {
         public readonly JSONStorableBool clothingContextEnabled;
-        public ConfigCharacterClothing(MVRScript mVRScript, ConfigInstanceStorable parent): base(parent) {
+        public ConfigCharacterClothing(ConfigInstanceStorable parent): base(parent) {
             clothingContextEnabled = new JSONStorableBool(GetStorableId("EnableClothingContext"), true);
-            mVRScript.RegisterBool(clothingContextEnabled);
+            Main.singleton.RegisterBool(clothingContextEnabled);
         }
     }
 }

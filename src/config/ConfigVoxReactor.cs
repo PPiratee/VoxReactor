@@ -7,7 +7,7 @@ namespace PPirate.VoxReactor
         public static ConfigVoxReactor singeton;
         public ConfigVoxReactor(MVRScript mVRScript) {
             singeton = this;
-            char1Config = new ConfigCharacterBase("ch1_", mVRScript);
+            char1Config = new ConfigCharacterBase("ch1_");
             //char2Config = new ConfigCharacterBase("ch2_", mVRScript);
         }
         public ConfigCharacterBase GetCharacterConfig(VoxtaCharacter character) {
