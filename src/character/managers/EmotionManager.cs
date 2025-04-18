@@ -13,7 +13,10 @@ namespace PPirate.VoxReactor
 {
     internal class EmotionManager: SafeMvr
     {
-        private Logger logger2;
+        private Logger logger;
+
+       
+
 
         private bool emotionsEnabled = true;
 
@@ -70,8 +73,8 @@ namespace PPirate.VoxReactor
         public readonly BlushManager blushManager;
         public EmotionManager(VoxtaCharacter character) {
             try {
-                logger2 = new Logger("VoxtaCharacter:Char#" + character.characterNumber);
-                logger2.Constructor();
+                logger = new Logger("VoxtaCharacter:Char#" + character.characterNumber);
+                logger.Constructor();
                 this.character = character;
 
                 hornieness = new Hornieness(this);
@@ -138,7 +141,7 @@ namespace PPirate.VoxReactor
         }
     
         private void OnHornyIncreaseCallback() {
-            logger2.StartMethod("OnHornyIncreaseCallback()");
+            logger.StartMethod("OnHornyIncreaseCallback()");
             hornieness.Increase(incrementHorny);
 
            // this.levelHorny = BindPercent(levelHorny, incrementHorny);
@@ -148,7 +151,7 @@ namespace PPirate.VoxReactor
         }
         private void OnHornyDecreaseCallback()
         {
-            logger2.StartMethod("OnHornyDecreaseCallback()");
+            logger.StartMethod("OnHornyDecreaseCallback()");
             hornieness.Decrease(-incrementHorny);
 
 
@@ -160,25 +163,25 @@ namespace PPirate.VoxReactor
         }
         private void OnHappyIncreaseCallback()
         {
-            logger2.StartMethod("OnHappyIncreaseCallback()");
+            logger.StartMethod("OnHappyIncreaseCallback()");
             happyness.Increase(incrementHappy);
             UpdateContext(happyness);
         }
         private void OnSadnessIncreaseCallback()
         {
-            logger2.StartMethod("OnSadnessIncreaseCallback()");
+            logger.StartMethod("OnSadnessIncreaseCallback()");
             sadness.Increase(incrementSadness);
             UpdateContext(sadness);
            }
         private void OnAngerIncreaseCallback()
         {
-            logger2.StartMethod("OnAngerIncreaseCallback()");
+            logger.StartMethod("OnAngerIncreaseCallback()");
             anger.Increase(incrementAnger);
             UpdateContext(anger);
         }
         private void OnEmbarrassmentIncreaseCallback()
         {
-            logger2.StartMethod("OnEmbarrassmentIncreaseCallback()");
+            logger.StartMethod("OnEmbarrassmentIncreaseCallback()");
             embarrasement.Increase(incremenEmbarrassment);
             UpdateContext(embarrasement);
         }
@@ -199,7 +202,7 @@ namespace PPirate.VoxReactor
         string lastContextItem;
         public Emotion currentStrongestEmotion;
         private void UpdateContext(Emotion emotionThatChanged) {
-            logger2.DEBUG("EmotionManager UpdateContext()");
+            logger.DEBUG("EmotionManager UpdateContext()");
             
             if (lastContextItem != null) { 
                 character.voxtaService.voxtaContextService.RemoveContextItem(lastContextItem);
@@ -265,7 +268,7 @@ namespace PPirate.VoxReactor
                 logMsg += " " + e.GetInfo();
             
             }
-            logger2.DEBUG(logMsg);
+            logger.DEBUG(logMsg);
         }
 
     }
@@ -356,8 +359,9 @@ namespace PPirate.VoxReactor
 
     }
     internal class Happyness : Emotion {
-        
-        public Happyness(EmotionManager emotionManager) : base(emotionManager, "happy", 40f) {
+        public static string happynessName = "happy";
+
+        public Happyness(EmotionManager emotionManager) : base(emotionManager, happynessName, 40f) {
             
         }
         protected override void IncreaseOverride(float increment) { 
@@ -379,8 +383,9 @@ namespace PPirate.VoxReactor
     }
     internal class Sadness : Emotion
     {
+        public static string sadnessName = "sad";
 
-        public Sadness(EmotionManager emotionManager) : base(emotionManager, "sad", 0f)
+        public Sadness(EmotionManager emotionManager) : base(emotionManager, sadnessName, 0f)
         {
             this.isNegativeEmotion = true;
         }
@@ -400,8 +405,8 @@ namespace PPirate.VoxReactor
     }
     internal class Anger : Emotion
     {
-
-        public Anger(EmotionManager emotionManager) : base(emotionManager, "angry", 0f)
+        public static string angerName = "angry";
+        public Anger(EmotionManager emotionManager) : base(emotionManager, angerName, 0f)
         {
             this.isNegativeEmotion = true;
         }
@@ -420,8 +425,9 @@ namespace PPirate.VoxReactor
     }
     internal class Embarrassment : Emotion
     {
+        public static string embarrassmentName = "embarrassed";
 
-        public Embarrassment(EmotionManager emotionManager) : base(emotionManager, "embarrassed", 35f)
+        public Embarrassment(EmotionManager emotionManager) : base(emotionManager, embarrassmentName, 35f)
         {
             this.isNegativeEmotion = true;
         }
@@ -447,8 +453,10 @@ namespace PPirate.VoxReactor
     }
     internal class Hornieness : Emotion
     {
+        public static string hornieNessName = "horny";
 
-        public Hornieness(EmotionManager emotionManager) : base(emotionManager, "horny", 20f)
+
+        public Hornieness(EmotionManager emotionManager) : base(emotionManager, hornieNessName, 20f)
         {
 
         }
