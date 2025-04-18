@@ -1,4 +1,5 @@
 src\clothing\ClothingItem.cs
+src\SafeMvr.cs
 src\utils\AtomUtils.cs
 src\utils\MacGruber_Utils.cs
 src\utils\Extensions.cs

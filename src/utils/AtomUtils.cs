@@ -18,6 +18,19 @@ namespace PPirate.VoxReactor
             }
             throw new Exception("unable to get storable with name " + recieverName);
         }
+        public static List<JSONStorable> GetRecievers(Atom atom, string recieverName)
+        {
+            List<JSONStorable> returnValues = new List<JSONStorable>();
+            List<string> storables = atom.GetStorableIDs();
+            foreach (string id in storables)
+            {
+                if (id.Contains(recieverName))
+                {
+                    returnValues.Add(atom.GetStorableByID(id));
+                }
+            }
+            return returnValues;
+        }
         public static Atom getAtomByUid(String id) { 
             List<Atom> atoms = SuperController.singleton.GetAtoms();
             foreach (Atom atom in atoms)
@@ -27,22 +40,6 @@ namespace PPirate.VoxReactor
                 }
             }
             throw new Exception("Unable to get atom with uid: " + id);
-        }
-        //todo move to a different util
-       
-
-        public static void RunAfterDelay(float delay, Action actionToCall)
-        {
-            Main.singleton.RunCoroutine(RunAfterDelayEnumerator(delay, actionToCall));
-        }
-
-        private static IEnumerator RunAfterDelayEnumerator(float delay, Action actionToCall)
-        {
-            // Wait for a random delay between minDelay and maxDelay
-            yield return new WaitForSeconds(delay);
-
-            // Call the provided action
-            actionToCall();
         }
     }
 }

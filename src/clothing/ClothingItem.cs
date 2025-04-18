@@ -11,12 +11,17 @@ namespace PPirate.VoxReactor.Clothing
         private readonly String voxReactorStorableID = "PPirate.VoxReactor.Main";
         JSONStorable voxReactorPlugin;
 
+        
+
+        
+
+
 
         public JSONStorableString description = new JSONStorableString("description", "");
         public JSONStorableBool isOffWhenHidden = new JSONStorableBool("takeOffOnHidden", false);
         public JSONStorableBool wantsToBeOn = new JSONStorableBool("wantsToBeOn", true);
         public JSONStorableBool isOn = new JSONStorableBool("isOn", true);
-  
+        public JSONStorableBool enableLogging = new JSONStorableBool("enableLogging", true);
 
 
         public JSONStorableBool isMaterialHidden;
@@ -25,12 +30,14 @@ namespace PPirate.VoxReactor.Clothing
 
         private PannelClothingItem pannelClothingItem;
 
-        private bool loggingEnabled = false;
+        private SafeMvr safeMvr;
+
         public override void Init()
         {
+            this.overrideId = $"TEsTSTOREID:{this.storeId}";
             RegisterBool(isOffWhenHidden);
             RegisterBool(wantsToBeOn);
-   
+
             RegisterBool(isOn);
 
             RegisterString(description);
@@ -38,9 +45,14 @@ namespace PPirate.VoxReactor.Clothing
             LogInfo();
 
 
+
+
+
             try
             {
                 voxReactorPlugin = AtomUtils.GetReciever(this.GetAtomById("CoreControl"), voxReactorStorableID);
+                
+
             }
             catch
             {
@@ -54,7 +66,7 @@ namespace PPirate.VoxReactor.Clothing
         void Start()
         {
             startHasRan = true;
-            if(wantsToBeOn.val)
+            if (wantsToBeOn.val)
                 TryPutOn();
         }
         public void OnEnable()
@@ -75,8 +87,10 @@ namespace PPirate.VoxReactor.Clothing
             wantsToBeOn.val = false;
             TakeOff();
             Utils.OnDestroyUI();
+            safeMvr.CleanUpCallbacks();
         }
-        public void TryPutOn() {
+        public void TryPutOn()
+        {
             Log("Start TryPutOn()");
             LogInfo();
             wantsToBeOn.val = true;
@@ -100,7 +114,8 @@ namespace PPirate.VoxReactor.Clothing
             Log("Start PutOn()");
             LogInfo();
 
-            if ((isMaterialHidden?.val ?? false) && isOffWhenHidden.val) {
+            if ((isMaterialHidden?.val ?? false) && isOffWhenHidden.val)
+            {
                 Log("Put on fail");
 
                 return;
@@ -108,8 +123,8 @@ namespace PPirate.VoxReactor.Clothing
 
             SetClothingServiceArgs();
 
-           voxReactorPlugin?.CallAction("OnAddCloth");
-           isOn.val = true;
+            voxReactorPlugin?.CallAction("OnAddCloth");
+            isOn.val = true;
             Log("End PutOn()");
             LogInfo();
         }
@@ -123,18 +138,21 @@ namespace PPirate.VoxReactor.Clothing
             Log("End TakeOff()");
             LogInfo();
         }
-      
-        
+
+
         private void SetClothingServiceArgs()
         {
-            voxReactorPlugin?.SetStringParamValue("ClothAtomName", this.containingAtom.name);
+            //voxReactorPlugin?.SetStringParamValue("ClothAtomName", this.containingAtom.name);//todo use this
+            voxReactorPlugin?.SetStringParamValue("ClothAtomName", "Person");//temp
             voxReactorPlugin?.SetStringParamValue("ClothDescription", description.val);
             //Log("SetClothingServiceArgs() ");
 
         }
 
-        private void Log(string msg) {
-            if (loggingEnabled) { 
+        private void Log(string msg)
+        {
+            if (enableLogging.val)
+            {
                 SuperController.LogMessage(msg);
             }
         }
@@ -149,7 +167,7 @@ namespace PPirate.VoxReactor.Clothing
             var materialReciever = AtomUtils.GetReciever(containingAtom, materialRecieverName);
             isMaterialHidden = materialReciever.GetBoolJSONParam("hideMaterial");
             //todo use safeMvr
-            isMaterialHidden.AddCallback( newIsHidden =>
+            isMaterialHidden.AddCallback(newIsHidden =>
             {
                 Log(" START HIDDENCALLBACK: " + newIsHidden);
                 LogInfo();
@@ -168,8 +186,9 @@ namespace PPirate.VoxReactor.Clothing
 
 
         }
-        private void LogInfo() {
-           
+        private void LogInfo()
+        {
+
             Log("wantsToBeOn: " + wantsToBeOn.val);
             Log("isOn: " + isOn.val);
             Log("isMaterialHidden: " + isMaterialHidden?.val ?? "null");
@@ -177,17 +196,19 @@ namespace PPirate.VoxReactor.Clothing
             Log("---------------------------");
 
         }
-        public void ShouldTakeOffOnHiddenChanged(bool sholdTakeOffOnHidden) {
+        public void ShouldTakeOffOnHiddenChanged(bool sholdTakeOffOnHidden)
+        {
             Log("Start ShouldTakeOffOnHiddenChanged()");
             LogInfo();
-            if (!sholdTakeOffOnHidden) {
+            if (!sholdTakeOffOnHidden)
+            {
                 if (!isOn.val && wantsToBeOn.val)
                     PutOn();
 
             }
             else if (sholdTakeOffOnHidden)
             {
-                if(isOn.val && (isMaterialHidden?.val ?? false))
+                if (isOn.val && (isMaterialHidden?.val ?? false))
                     TakeOff();
                 if (!isOn.val && (!isMaterialHidden?.val ?? false))
                     PutOn();
@@ -216,6 +237,6 @@ namespace PPirate.VoxReactor.Clothing
             if (useDefault) callback(jsonParam.defaultVal);
             else callback(jsonParam.val);
         }
-       
+
     }
 }

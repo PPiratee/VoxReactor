@@ -14,34 +14,38 @@ namespace PPirate.VoxReactor
     public class Main : MVRScript
     {
         private readonly SafeMvr safeMvr = new SafeMvr();
-        private readonly Logger logger = new Logger("Main");
+        private readonly Logger logger = new Logger("Main", 0);
 
         public static Main singleton;
-        
+
         private VoxtaService voxtaService;
         private readonly List<Action<float>> fixedUpdateTimeConsumers = new List<Action<float>>();//todo maybe consumers should just be MVR scripts
         private readonly List<Action<float>> consumersToRemove = new List<Action<float>>();
 
-        private PannelMain mainPannel;       
+        private PannelMain mainPannel;
 
         private ConfigVoxReactor config;
         public ConfigVoxReactor Config => config;
 
 
-       // private JSONStorable voxtaStorable = null;
+
+
+        // private JSONStorable voxtaStorable = null;
         private VoxtaPlugin voxtaPlugin = null;
         public override void Init()
         {
+
             logger.StartMethod("Init()");
-            
-            
+
+
             singleton = this;
-            
+
             config = new ConfigVoxReactor(this);
             RegisterAction(new JSONStorableAction("OnReload", LoadCharacters));
 
             LoadUI();
-            if (voxtaPlugin == null) { 
+            if (voxtaPlugin == null)
+            {
                 GetMainVoxtaAtom();
             }
 
@@ -58,21 +62,25 @@ namespace PPirate.VoxReactor
                 GetMainVoxtaAtom();
             }
             LoadVoxtaService();
-        }
-        
-        
 
-        public void RunCoroutine(IEnumerator callback) { //todo this is stupid. use main.StartCoroutine
+        }
+
+
+
+        public void RunCoroutine(IEnumerator callback)
+        { //todo this is stupid. use main.StartCoroutine
             StartCoroutine(callback);
         }
         public void PushFixedDeltaTimeConsumer(Action<float> callback)
         {
-            if (fixedUpdateTimeConsumers.Contains(callback)) {
+            if (fixedUpdateTimeConsumers.Contains(callback))
+            {
                 return;
             }
             fixedUpdateTimeConsumers.Add(callback);
         }
-        public void RemoveFixedDeltaTimeConsumer(Action<float> callback) {
+        public void RemoveFixedDeltaTimeConsumer(Action<float> callback)
+        {
             consumersToRemove.Add(callback);
         }
 
@@ -93,12 +101,13 @@ namespace PPirate.VoxReactor
             catch (Exception e)
             {
                 logger.ERR("Exception caught: " + e);
-              
+
             }
         }
         #endregion
         #region UI
-        private void LoadUI() {
+        private void LoadUI()
+        {
             UIManager.SetScript(this, CreateUIElement, leftUIElements, rightUIElements);
             Utils.OnInitUI(CreateUIElement);
             mainPannel = new PannelMain(this, leftUIElements, rightUIElements);
@@ -124,23 +133,26 @@ namespace PPirate.VoxReactor
                     safeMvr.AddChild(this.voxtaPlugin);
                     logger.DEBUG("Found atom with voxta plugin.");
                     voxtaPlugin.setUpCallbacks();
-                
+
 
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     continue;
                 }
                 break;
             }
         }
-    void OnDestroy() {
+        void OnDestroy()
+        {
             logger.StartMethod("OnDestroy()");
 
-           // voxtaService.CleanUp();
+            // voxtaService.CleanUp();
             safeMvr.CleanUpCallbacks();
             Utils.OnDestroyUI();
-    }
-    private void LoadVoxtaService() {
+        }
+        private void LoadVoxtaService()
+        {
             logger.StartMethod("LoadVoxtaService()");
 
             safeMvr.RemoveChild(voxtaService);
@@ -149,9 +161,28 @@ namespace PPirate.VoxReactor
 
             mainPannel.characterPannel.OnVoxCharactersLoaded();
             DrawUI();
+            NotifyClothingItems();
+
+        }
+        public static void RunAfterDelay(float delay, Action actionToCall)
+        {
+            Main.singleton.RunCoroutine(RunAfterDelayEnumerator(delay, actionToCall));
+        }
+        private static IEnumerator RunAfterDelayEnumerator(float delay, Action actionToCall)
+        {
+            yield return new WaitForSeconds(delay);
+            actionToCall();
+        }
+        private void NotifyClothingItems()
+        {
+            VoxtaService.singleton.characters.ForEach(character =>
+            {
+              //  AtomUtils.GetRecievers(character.atom, )
+            });
         }
     }
 
     #endregion
+
 
 }

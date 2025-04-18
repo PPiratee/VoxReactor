@@ -75,7 +75,7 @@ namespace PPirate.VoxReactor
 
             if (isActive) {
                 
-                AtomUtils.RunAfterDelay(2f, () => {
+                Main.RunAfterDelay(2f, () => {
                     foreach (var item in queuedItems)
                     {
                         AddContextItem(item);

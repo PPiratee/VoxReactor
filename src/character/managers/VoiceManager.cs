@@ -54,7 +54,7 @@ namespace PPirate.VoxReactor
             
             gazeManager.LookAtPlayer();
             float talkingHeadBobDelay = 0f;
-            AtomUtils.RunAfterDelay(talkingHeadBobDelay,() => { 
+            Main.RunAfterDelay(talkingHeadBobDelay,() => { 
                 headTimeLine.Talk();
                 
             });

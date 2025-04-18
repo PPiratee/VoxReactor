@@ -59,7 +59,7 @@ namespace PPirate.VoxReactor
 
             float deblushDelay = UnityEngine.Random.Range(blushDurationMin, blushDurationMax);
             pendingDeBlush = true;
-            AtomUtils.RunAfterDelay(deblushDelay,() => {
+            Main.RunAfterDelay(deblushDelay,() => {
                 if (!pendingDeBlush) {
                     return;
                 }

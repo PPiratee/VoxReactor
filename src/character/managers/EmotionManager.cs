@@ -298,7 +298,7 @@ namespace PPirate.VoxReactor
             }
             isExpressionReactionInProgress = true;
             emotionManager.character.expressionManager.LoadExpression(name);
-            AtomUtils.RunAfterDelay(expressionReactionDuration, () => {
+            Main.RunAfterDelay(expressionReactionDuration, () => {
                 isExpressionReactionInProgress = false;
                 if (emotionManager.currentStrongestEmotion == this) {
                     return;

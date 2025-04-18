@@ -65,7 +65,7 @@ namespace PPirate.VoxReactor
             timesBlinked = 0;
             for (int i = 0; i < timesToBlink; i++)
             {
-                AtomUtils.RunAfterDelay(i * timeBetweenBatts, Blink);
+                Main.RunAfterDelay(i * timeBetweenBatts, Blink);
             }
 
 
@@ -99,7 +99,7 @@ namespace PPirate.VoxReactor
                 pendingWink = false;
                 character.plugins.glancePlugin.SetBlinkEnabled(false);
                 character.plugins.headTimeLine.PlayWink();
-                AtomUtils.RunAfterDelay(1f, () => {
+                Main.RunAfterDelay(1f, () => {
                     character.plugins.glancePlugin.SetBlinkEnabled(true);
                 });
             }
