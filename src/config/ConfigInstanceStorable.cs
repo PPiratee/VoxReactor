@@ -1,7 +1,7 @@
 ﻿
 namespace PPirate.VoxReactor
 {
-    public abstract class ConfigInstanceStorable
+    internal abstract class ConfigInstanceStorable
     {
         private readonly string idPrefix;
         private readonly ConfigInstanceStorable parent;

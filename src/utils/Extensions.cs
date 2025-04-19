@@ -223,14 +223,8 @@ namespace CheesyFX
             UIElements?.Add(button);
             return button;
         }
-        /*
-        public static UIDynamicTextInfo CreateStaticInfo(this MVRScript script, string text, float height, List<object> UIElements = null, bool rightSide = false)
-        {
-            var uid = Utils.SetupInfoTextNoScroll(FillMeUp.singleton, text, height, true);
-            uid.background.offsetMin = new Vector2(0, 0);
-            UIElements?.Add(uid);
-            return uid;
-        }*/
+        
+        
 
         public static FloatTriggerManager AddFloatTriggerManager(this MVRScript script, JSONStorableFloat driver, bool absoluteDef = false, float thresholdDef = 0f, float fromDef = 0f, float toDef = 1f)
         {
@@ -1196,6 +1190,7 @@ namespace CheesyFX
             {
                 JSONStorableString storableString = jsonParam as JSONStorableString;
                 uiDynamic = Utils.SetupTextInput(script, storableString.name, storableString, rightSide);
+                
             }
             else if (jsonParam is JSONStorableColor)
             {
@@ -1205,6 +1200,14 @@ namespace CheesyFX
 
             if (UIElements != null) UIElements.Add(uiDynamic);
             return uiDynamic;
+        }
+
+        public static UIDynamicTextInfo CreateStaticInfo(this string text, float height, List<object> UIElements = null, bool rightSide = false)
+        {
+            var uid = Utils.SetupInfoTextNoScroll(Main.singleton, text, height, true);
+            uid.background.offsetMin = new Vector2(0, 0);
+            UIElements?.Add(uid);
+            return uid;
         }
 
         public static void SetInteractable(this UIDynamicSlider slider, bool val)

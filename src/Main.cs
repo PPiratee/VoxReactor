@@ -19,13 +19,13 @@ namespace PPirate.VoxReactor
         public static Main singleton;
         
         private VoxtaService voxtaService;
-        private readonly List<Action<float>> fixedUpdateTimeConsumers = new List<Action<float>>();//todo maybe consumers should just be MVR scripts
+        private readonly List<Action<float>> fixedUpdateTimeConsumers = new List<Action<float>>();
         private readonly List<Action<float>> consumersToRemove = new List<Action<float>>();
 
         private PannelMain mainPannel;       
 
         private ConfigVoxReactor config;
-        public ConfigVoxReactor Config => config;
+        internal ConfigVoxReactor Config => config;
 
 
        // private JSONStorable voxtaStorable = null;

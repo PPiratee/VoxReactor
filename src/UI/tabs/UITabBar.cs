@@ -68,8 +68,10 @@ namespace PPirate.VoxReactor
 !> (UITabBar)<Main/MainTabBar> - Selecting pannel Main Settings*/
         public void CreateTabs(List<UIPannel> pannels)
         {
-           // SuperController.LogError("(UITabBar)" + tabBarName + " - Create Tabs");
-
+            // SuperController.LogError("(UITabBar)" + tabBarName + " - Create Tabs");
+            if (pannels.Count == 0) {
+                return;
+            }
             this.pannels = pannels;
             CreateTabs();
         }
