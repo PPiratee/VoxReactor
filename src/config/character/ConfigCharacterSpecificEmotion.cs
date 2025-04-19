@@ -76,6 +76,30 @@ namespace PPirate.VoxReactor
             embarrassmentMultiplier.SetDefaultFromCurrent();
             return this;
         }
+        public float GetMultiplierForEmotion(string emotionName) {
+            if (emotionName == Hornieness.hornieNessName)
+            {
+                return hornynessMultiplier.val;
+            }
+            else if (emotionName == Happyness.happynessName)
+            {
+                return happynessMultiplier.val;
+            }
+            else if (emotionName == Sadness.sadnessName)
+            {
+                return sadnessMultiplier.val;
+            }
+            else if (emotionName == Anger.angerName)
+            {
+                return angerMultiplier.val;
+            }
+            else if (emotionName == Embarrassment.embarrassmentName)
+            {
+                return embarrassmentMultiplier.val;
+            }
+
+            return 0f;
+        }
 
     }
 }

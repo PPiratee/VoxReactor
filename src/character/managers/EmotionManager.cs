@@ -61,7 +61,7 @@ namespace PPirate.VoxReactor
         public static String REGISTRY_ON_HORNY_CHANGED = "hornyChanged";
 
 
-
+        public readonly ConfigCharacterEmotions emotionsConfig;
 
 
         public VoxtaCharacter character;
@@ -117,9 +117,9 @@ namespace PPirate.VoxReactor
 
                 blushManager = new BlushManager(character);
 
-                ConfigCharacterEmotions emotionConfig = ConfigVoxReactor.singeton.GetCharacterConfig(character).emotionConfig;
+                emotionsConfig = ConfigVoxReactor.singeton.GetCharacterConfig(character).emotionConfig;
 
-                AddCallback(emotionConfig.emotionsEnabled, EmotionsEnabledToggle);
+                AddCallback(emotionsConfig.emotionsEnabled, EmotionsEnabledToggle);
                 
 
                 UpdateContext(null);
@@ -285,11 +285,13 @@ namespace PPirate.VoxReactor
             this.value = startingValue;
         }
 
+        
 
-        public void Increase(float increment) {
+        public void Increase(float increment, bool effectOtherEmotions = true) {
             value = BindPercent(value, increment);
             IncreaseOverride(increment);
-            EffectOtherEmotions(increment);
+            if(effectOtherEmotions)
+                EffectOtherEmotions(increment);
 
         }
         protected abstract void IncreaseOverride(float increment);
@@ -301,6 +303,21 @@ namespace PPirate.VoxReactor
           
         }
         protected abstract void DecreaseOverride(float decrement);
+        public void ChangeValueViaMultiplier(float increment)
+        {
+            if (increment == 0)
+            {
+                return;
+            }
+            if (increment > 0)
+            {
+                Increase(increment, false);
+            }
+            else
+            {
+                Decrease(increment);
+            }
+        }
         public virtual void ApplyExpression() {
             emotionManager.character.expressionManager.LoadExpression(name);
         }
@@ -348,11 +365,13 @@ namespace PPirate.VoxReactor
         }
 
         public void EffectOtherEmotions(float increment) {
-            var emotionsToDecrease = emotionManager.allEmotions.Where(e => e.isNegativeEmotion == !isNegativeEmotion && e != this);
 
-            foreach (var item in emotionsToDecrease)
+            var emotionsToEffect = emotionManager.allEmotions.Where(e => e != this);
+            var emotionConfig = emotionManager.emotionsConfig.GetEmotionConfigByName(this.name);
+            foreach (var otherEmotion in emotionsToEffect)
             {
-                item.Decrease(-increment);
+                float multiplier = emotionConfig.GetMultiplierForEmotion(otherEmotion.name);
+               otherEmotion.ChangeValueViaMultiplier(increment * multiplier);
             }
         }
 
