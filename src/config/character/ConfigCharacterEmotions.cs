@@ -30,7 +30,7 @@ namespace PPirate.VoxReactor
             happynessConfig = new ConfigCharacterSpecificEmotion(Happyness.happynessName, this)
                 .SetAngerMultiplier(-1)
                 .SetSadnessMultiplier(-1)
-                .SetEmbarrassmentMultiplier(-0.15f);
+                .SetEmbarrassmentMultiplier(-0.75f);
             configs.Add(happynessConfig);
 
 

@@ -21,7 +21,11 @@ namespace PPirate.VoxReactor
         {
             ClearPannelUI();
             MakeBackButton();
-        
+
+            string info = "Multipliers: If this emotion is increased by X, then emotion B's value is increased by X * BMultiplier";
+
+         
+            info.CreateStaticInfo(120, uiElements, false);
 
             var contextEnabledToggle = (UIDynamicToggle)emotionConfig.emotionEnabled.CreateUI(uiElements, false);
             contextEnabledToggle.label = $"{emotionConfig.emotionName} enabled";
