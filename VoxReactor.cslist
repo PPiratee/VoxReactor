@@ -51,11 +51,11 @@ src\UI\tabs\UITabBar.cs
 src\UI\tabs\UIPannel.cs
 src\UI\pannels\PannelMain.cs
 src\UI\pannels\PannelMainSettings.cs
-src\UI\pannels\PannelCharacters.cs
-src\UI\pannels\PannelCharacter.cs
 src\UI\pannels\SubSubMenu.cs
-src\UI\pannels\PannelCharacterClothingSettings.cs
-src\UI\pannels\PannelCharacterEmotionSettings.cs
+src\UI\pannels\PannelCharacters.cs
+src\UI\pannels\character\PannelCharacter.cs
+src\UI\pannels\character\PannelCharacterClothingSettings.cs
+src\UI\pannels\character\PannelCharacterEmotionSettings.cs
 src\config\ConfigVoxReactor.cs
 src\config\ConfigInstanceStorable.cs
 src\config\character\ConfigCharacterBase.cs
