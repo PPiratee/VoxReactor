@@ -24,7 +24,32 @@ namespace PPirate.VoxReactor
         
 
             var contextEnabledToggle = (UIDynamicToggle)emotionConfig.emotionEnabled.CreateUI(uiElements, false);
-            contextEnabledToggle.label = "Emotion Enabled";
+            contextEnabledToggle.label = $"{emotionConfig.emotionName} enabled";
+
+            if (emotionConfig.emotionName != Hornieness.hornieNessName) {
+                var hornySlider = (UIDynamicSlider)emotionConfig.hornynessMultiplier.CreateUI(uiElements, false);
+                hornySlider.label = $"HornynessMultiplier";
+            }
+            if (emotionConfig.emotionName != Happyness.happynessName)
+            {
+                var hornySlider = (UIDynamicSlider)emotionConfig.happynessMultiplier.CreateUI(uiElements, false);
+                hornySlider.label = $"HappynessMultiplier";
+            }
+            if (emotionConfig.emotionName != Sadness.sadnessName)
+            {
+                var sadSLider = (UIDynamicSlider)emotionConfig.sadnessMultiplier.CreateUI(uiElements, false);
+                sadSLider.label = $"SadnessMultiplier";
+            }
+            if (emotionConfig.emotionName != Anger.angerName)
+            {
+                var sadSLider = (UIDynamicSlider)emotionConfig.angerMultiplier.CreateUI(uiElements, false);
+                sadSLider.label = $"AngerMultiplier";
+            }
+            if (emotionConfig.emotionName != Embarrassment.embarrassmentName)
+            {
+                var sadSLider = (UIDynamicSlider)emotionConfig.embarrassmentMultiplier.CreateUI(uiElements, false);
+                sadSLider.label = $"EmbarrasementMultiplier";
+            }
 
 
         }

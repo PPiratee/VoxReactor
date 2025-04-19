@@ -20,9 +20,10 @@ namespace PPirate.VoxReactor
             subPannels = new List<UIPannel>()
             {
                 new PannelCharacterSpecificEmotionSettings(this, character, emotionsConfig.hornienessConfig),
-                new PannelCharacterSpecificEmotionSettings(this, character, emotionsConfig.happynessConfig)
-                //new PannelCharacterClothingSettings(this, character, characterConfig.clothingConfig),
-               // new PannelCharacterEmotionSettings(this, character, characterConfig.emotionConfig)
+                new PannelCharacterSpecificEmotionSettings(this, character, emotionsConfig.happynessConfig),
+                new PannelCharacterSpecificEmotionSettings(this, character, emotionsConfig.sadnessConfig),
+                new PannelCharacterSpecificEmotionSettings(this, character, emotionsConfig.angerConfig),
+                new PannelCharacterSpecificEmotionSettings(this, character, emotionsConfig.embarrassmentConfig),
             };
         }
         
@@ -35,12 +36,7 @@ namespace PPirate.VoxReactor
             contextEnabledToggle.label = "Emotions Enabled";
             
           
-                emotionsTabBar.CreateTabs(subPannels);
-
-            //clothingConfig.clothingContextEnabled.AddCallback(isEnabled => to safmvvr
-            // {
-            //     character.clothingManager.ContextEnabled = isEnabled;
-            //  }, false);
+           emotionsTabBar.CreateTabs(subPannels);
         }
     }
 }
