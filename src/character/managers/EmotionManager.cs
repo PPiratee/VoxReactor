@@ -13,7 +13,7 @@ namespace PPirate.VoxReactor
 {
     internal class EmotionManager: SafeMvr
     {
-        private Logger logger;
+        public Logger logger;
 
        
 
@@ -73,7 +73,7 @@ namespace PPirate.VoxReactor
         public readonly BlushManager blushManager;
         public EmotionManager(VoxtaCharacter character) {
             try {
-                logger = new Logger("VoxtaCharacter:Char#" + character.characterNumber);
+                logger = new Logger("VoxtaCharacter:Char#" + character.characterNumber, 0);
                 logger.Constructor();
                 this.character = character;
 
@@ -289,6 +289,7 @@ namespace PPirate.VoxReactor
         
 
         public void Increase(float increment, bool effectOtherEmotions = true) {
+            emotionManager.logger.StartMethod("EmotionIncrease " + this.name);
             value = BindPercent(value, increment);
             IncreaseOverride(increment);
             if(effectOtherEmotions)
@@ -451,6 +452,7 @@ namespace PPirate.VoxReactor
         public Embarrassment(EmotionManager emotionManager) : base(emotionManager, embarrassmentName, 0)
         {
             this.isNegativeEmotion = true;
+            this.blushConfig = emotionManager.character.myConfig.blushConfig;
         }
         protected override void IncreaseOverride(float increment)
         {

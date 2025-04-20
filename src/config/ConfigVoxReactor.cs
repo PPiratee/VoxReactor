@@ -16,6 +16,14 @@ namespace PPirate.VoxReactor
             }
             throw new System.Exception("unable to get character config for: " + character.characterNumber);
         }
+        public ConfigCharacterBase GetCharacterConfig(int characterNumber)
+        {
+            if (characterNumber == 1)
+            {
+                return char1Config;
+            }
+            throw new System.Exception("unable to get character config for character: " + characterNumber);
+        }
 
 
     }

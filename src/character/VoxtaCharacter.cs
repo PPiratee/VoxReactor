@@ -41,6 +41,8 @@ namespace PPirate.VoxReactor
 
         public readonly EventShowTits eventShowTits;
 
+        public readonly ConfigCharacterBase myConfig;
+
 
 
         private readonly Logger logger;
@@ -48,8 +50,8 @@ namespace PPirate.VoxReactor
         {
             try
             {
-
                 logger = new Logger("VoxtaCharacter:Char#" + characterNumber);
+                myConfig = ConfigVoxReactor.singeton.GetCharacterConfig(characterNumber);
                 logger.StartMethod("Constructor"); 
                 logger.DEBUG("VoxtaCharacter - I am constructed, my name is " + name);
                 this.characterNumber = characterNumber;
