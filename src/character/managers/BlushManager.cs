@@ -84,11 +84,18 @@ namespace PPirate.VoxReactor
         
         public void LerpToMinBLush()
         {
-            if (!isBLushing && !pendingDeBlush && blushConfig.blushEnabled.val)
+            logger.StartMethod("LerpToMinBLush()");
+            logger.DEBUG("isBLushing: " + isBLushing);
+            if (isBLushing || !blushConfig.blushEnabled.val)
             {
-                blushTarget = GetMinBlush();
-                StartBlushInterpolating();
+                return;
             }
+            isBLushing = true;
+            isDeblushing = false;
+            currentSpeed = blushSpeed;
+
+            blushTarget = GetMinBlush();
+            StartBlushInterpolating();
         }
 
         public void CancelPendingDeblush()
@@ -101,15 +108,10 @@ namespace PPirate.VoxReactor
             if (!fixedUpdateEnabled) {
                 return;
             }
-          // SuperController.LogError("interpoalting");
             bool isDone = clothingItem1.BlushUpdate(deltaTime);
             bool isDone2 = clothingItem2.BlushUpdate(deltaTime);
 
             if (isDone && isDone2) {
-                
-
-                
-                
 
                 if (isBLushing)
                 {
@@ -166,12 +168,19 @@ namespace PPirate.VoxReactor
         private float GetMinBlush()
         {
             //float embarrasement = character.emotionManager.embarrasement.value;
+            bool useEmbarrass = blushConfig.emotionEmbarrasedSetsMinimumBLush.val;
+            bool useHorny = blushConfig.emotionHornySetsMinimumBlush.val;
 
-            if (blushConfig.emotionEmbarrasedSetsMinimumBLush.val) { 
-                return character.emotionManager.embarrasement.value;
+            float embarass = character.emotionManager.embarrasement.value;
+            float horny = character.emotionManager.hornieness.value;
+
+            if (useEmbarrass && useHorny) {
+                return Mathf.Max(embarass, horny);
+            } else if (useEmbarrass) {
+                return embarass;
+            } else if (useHorny) {
+                return horny;
             }
-
-            //float hornyNess = character.emotionManager.embarrasement.value;
             return 0;
         }
         internal class BlushClothingConfig {

@@ -15,8 +15,6 @@ namespace PPirate.VoxReactor
     {
         public Logger logger;
 
-       
-
 
         private bool emotionsEnabled = true;
 
@@ -26,9 +24,6 @@ namespace PPirate.VoxReactor
         private readonly int incrementSadness = 10;
         private readonly int incrementAnger = 10;
         private readonly int incremenEmbarrassment = 10;
-
-
-
 
 
         List<Emotion> mainEmotions = new List<Emotion>(); // only context on the strongest will be provided
@@ -73,7 +68,7 @@ namespace PPirate.VoxReactor
         public readonly BlushManager blushManager;
         public EmotionManager(VoxtaCharacter character) {
             try {
-                logger = new Logger("VoxtaCharacter:Char#" + character.characterNumber, 0);
+                logger = new Logger("VoxtaCharacter:Char#" + character.characterNumber);
                 logger.Constructor();
                 this.character = character;
 
@@ -277,7 +272,7 @@ namespace PPirate.VoxReactor
         protected EmotionManager emotionManager;
         public readonly string name;
         public float value;
-        public bool isNegativeEmotion = false;
+
         
 
         public Emotion(EmotionManager emotionManager, string name, float startingValue) {
@@ -408,7 +403,7 @@ namespace PPirate.VoxReactor
 
         public Sadness(EmotionManager emotionManager) : base(emotionManager, sadnessName, 0f)
         {
-            this.isNegativeEmotion = true;
+
         }
         protected override void IncreaseOverride(float increment)
         {
@@ -429,7 +424,6 @@ namespace PPirate.VoxReactor
         public static string angerName = "angry";
         public Anger(EmotionManager emotionManager) : base(emotionManager, angerName, 0f)
         {
-            this.isNegativeEmotion = true;
         }
         protected override void IncreaseOverride(float increment)
         {
@@ -451,7 +445,6 @@ namespace PPirate.VoxReactor
 
         public Embarrassment(EmotionManager emotionManager) : base(emotionManager, embarrassmentName, 0)
         {
-            this.isNegativeEmotion = true;
             this.blushConfig = emotionManager.character.myConfig.blushConfig;
         }
         protected override void IncreaseOverride(float increment)
@@ -477,18 +470,25 @@ namespace PPirate.VoxReactor
     {
         public static string hornieNessName = "horny";
 
-
+        private readonly ConfigCharacterBlushSettings blushConfig;
         public Hornieness(EmotionManager emotionManager) : base(emotionManager, hornieNessName, 20f)
         {
-
+            this.blushConfig = emotionManager.character.myConfig.blushConfig;
         }
         protected override void IncreaseOverride(float increment)
         {
-
+            if (blushConfig.emotionHornySetsMinimumBlush.val)
+            {
+                emotionManager.blushManager.CancelPendingDeblush();
+                emotionManager.blushManager.LerpToMinBLush();
+            }
         }
         protected override void DecreaseOverride(float decrement)
         {
-
+            if (blushConfig.emotionHornySetsMinimumBlush.val)
+            {
+                emotionManager.blushManager.LerpToMinBLush();
+            }
         }
         public override void ApplyExpression()
         {

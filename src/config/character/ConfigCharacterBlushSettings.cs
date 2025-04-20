@@ -6,6 +6,7 @@ namespace PPirate.VoxReactor
     {
         public readonly JSONStorableBool blushEnabled;
         public readonly JSONStorableBool emotionEmbarrasedSetsMinimumBLush;
+        public readonly JSONStorableBool emotionHornySetsMinimumBlush;
         public readonly JSONStorableFloat blushDurationMin;
         public readonly JSONStorableFloat blushDurationMax;
 
@@ -16,6 +17,9 @@ namespace PPirate.VoxReactor
 
             emotionEmbarrasedSetsMinimumBLush = new JSONStorableBool(GetStorableId("EmotionEmbarrasedSetsMinimumBLush"), true);
             Main.singleton.RegisterBool(emotionEmbarrasedSetsMinimumBLush);
+
+            emotionHornySetsMinimumBlush = new JSONStorableBool(GetStorableId("EmotionHornySetsMinimumBLush"), false);
+            Main.singleton.RegisterBool(emotionHornySetsMinimumBlush);
 
             blushDurationMin = new JSONStorableFloat(GetStorableId("BlushDurationMin"), 0f, 0, 60, true, true);
             Main.singleton.RegisterFloat(blushDurationMin);
