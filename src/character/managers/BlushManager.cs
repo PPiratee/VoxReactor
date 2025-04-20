@@ -27,6 +27,7 @@ namespace PPirate.VoxReactor
         readonly AcidGlancePlugin glancePlugin;
 
         private readonly Logger logger;
+        private readonly JSONStorableAction OnBlush;
 
         public BlushManager(VoxtaCharacter character) {
             logger = new Logger("BlushManager:Char#" + character.characterNumber);
@@ -38,11 +39,14 @@ namespace PPirate.VoxReactor
 
             clothingItem1 = new BlushClothingConfig("VRDollz:Makeup Blush2 VRDMaterialFace", this, - 1.0f, -0.75f);
             clothingItem2 = new BlushClothingConfig("crimeless:face_blushMaterialCombined", this, -0.61f, - 0.365f);
+            OnBlush = new JSONStorableAction($"OnBlush_{character.role}", Blush);
+            Main.singleton.RegisterAction(OnBlush);
         }
 
         private bool pendingDeBlush = false;
         private bool isBLushing = false;
-        public void OnBlush() {
+        public void Blush() {
+           
            
             logger.StartMethod("OnBlush()");
             if (isBLushing) {
@@ -69,10 +73,24 @@ namespace PPirate.VoxReactor
             });
 
         }
+        public void BlushToMinimum() {
+            logger.StartMethod("BlushToMinimum()");
+            if (isBLushing)
+            {
+                return;
+            }
+          //  glancePlugin.LoadPresetShy();
+
+            isBLushing = true;
+            currentSpeed = blushSpeed;
+
+            blushTarget = minBlush;
+            StartBlushInterpolating();
+        }
         
 
         public void BlushUpdate(float deltaTime) {
-           // SuperController.LogError("interpoalting");
+           SuperController.LogError("interpoalting");
             bool isDone = clothingItem1.BlushUpdate(deltaTime);
             bool isDone2 = clothingItem2.BlushUpdate(deltaTime);
 
@@ -155,8 +173,10 @@ namespace PPirate.VoxReactor
 
             public bool BlushUpdate(float deltaTime)
             {
-                //SuperController.LogError("current alpha: "+ clothing.GetFloatParamValue("Alpha Adjust"));
+                SuperController.LogError("current alpha: "+ clothing.GetFloatParamValue("Alpha Adjust"));
+
                 float targetAlpha = SimpleLerp(alphaNoBlush, alphaFullBlush, blushManager.blushTarget);
+                SuperController.LogError("target: " + targetAlpha);
                 float blush1NewAlpha = LerpWithSpeed(interpolationStartingValue, targetAlpha, blushManager.currentSpeed, deltaTime);
 
                 clothing.SetFloatParamValue("Alpha Adjust", blush1NewAlpha);

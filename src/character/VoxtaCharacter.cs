@@ -57,6 +57,7 @@ namespace PPirate.VoxReactor
                 this.atom = atom;
                 this.main = main;
                 this.voxtaService = voxtaService;
+                this.role = VoxtaPlugin.singleton.GetCharacterRole(characterNumber);
 
 
                 actionObserverRegistry = new ObserverRegistry();
@@ -66,6 +67,7 @@ namespace PPirate.VoxReactor
                 gazeManager = new GazeManager(this);
                 expressionManager = new ExpressionManager(this);
                 emotionManager = new EmotionManager( this);//depends on gazeManager being set
+                AddChild(emotionManager);
                 voiceManager = new VoiceManager(this);
                 touchManager = new TouchManager(this);
                 lookingAtManager = new LookingAtManager(this);

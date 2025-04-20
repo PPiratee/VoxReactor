@@ -34,7 +34,7 @@ namespace PPirate.VoxReactor
 
             character.stateManager.observerRegistry.RegisterObserver(StateManager.REGISTRY_START_SPEAKING, OnSpeaking);
             character.stateManager.observerRegistry.RegisterObserver(StateManager.REGISTRY_STOP_SPEAKING, OnSpeakingStop);
-            character.actionObserverRegistry.RegisterObserver(VOX_ACTION_GIGGLE + character.characterNumber, OnGiggle);
+            //todo make this optional, and add a random chance. character.actionObserverRegistry.RegisterObserver(VOX_ACTION_GIGGLE + character.characterNumber, OnGiggle);
 
 
             OnNarrateThoughts = new JSONStorableAction("OnNarrateThoughts", OnNarrateThoughtsCallback);

@@ -1,11 +1,13 @@
 ﻿
 namespace PPirate.VoxReactor
 {
-    public class ConfigCharacterBase : ConfigInstanceStorable
+    internal class ConfigCharacterBase : ConfigInstanceStorable
     {
         public readonly ConfigCharacterClothing clothingConfig;
-        public ConfigCharacterBase(string idPrefix, MVRScript mVRScript): base(idPrefix) {
-            clothingConfig = new ConfigCharacterClothing(mVRScript, this);
+        public readonly ConfigCharacterEmotions emotionConfig;
+        public ConfigCharacterBase(string idPrefix): base(idPrefix) {
+            clothingConfig = new ConfigCharacterClothing(this);
+            emotionConfig = new ConfigCharacterEmotions(this);
         }
         
         
