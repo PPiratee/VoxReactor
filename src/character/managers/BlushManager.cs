@@ -55,7 +55,7 @@ namespace PPirate.VoxReactor
         }
 
         private bool pendingDeBlush = false;
-        private bool isBLushing = false;
+        private bool isBLushing = false; // as in blush event, going to the bax blush,
         public void Blush() {
             logger.StartMethod("OnBlush()");
             if (isBLushing || !blushConfig.blushEnabled.val)
@@ -71,6 +71,7 @@ namespace PPirate.VoxReactor
 
             StartBlushInterpolating();
 
+            /*
             float deblushDelay = UnityEngine.Random.Range(blushConfig.blushDurationMin.val, blushConfig.blushDurationMax.val);
             pendingDeBlush = true;
             AtomUtils.RunAfterDelay(deblushDelay,() => {
@@ -81,6 +82,7 @@ namespace PPirate.VoxReactor
                 blushTarget = minBlush;
                 StartBlushInterpolating();
             });
+            */ //wip
 
         }
         public void SetMinBlush(float minBlush)
@@ -114,12 +116,27 @@ namespace PPirate.VoxReactor
             bool isDone2 = clothingItem2.BlushUpdate(deltaTime);
 
             if (isDone && isDone2) {
+                /*
                 if (!isBLushing) {
                     pendingDeBlush = false;
                     glancePlugin.LoadPresetDefault();
                 }
+                */ //wip
                 isBLushing = false;
                 character.main.RemoveFixedDeltaTimeConsumer(BlushUpdate);
+
+                float deblushDelay = UnityEngine.Random.Range(blushConfig.blushDurationMin.val, blushConfig.blushDurationMax.val);
+                pendingDeBlush = true;
+                AtomUtils.RunAfterDelay(deblushDelay, () => {
+                    if (!pendingDeBlush)
+                    {
+                        return;
+                    }
+                    pendingDeBlush = false;
+                    currentSpeed = deblushSpeed;
+                    blushTarget = minBlush;
+                    StartBlushInterpolating();
+                });
             }
         }
        
