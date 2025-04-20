@@ -57,6 +57,7 @@ namespace PPirate.VoxReactor
                 this.atom = atom;
                 this.main = main;
                 this.voxtaService = voxtaService;
+                this.role = VoxtaPlugin.singleton.GetCharacterRole(characterNumber);
 
 
                 actionObserverRegistry = new ObserverRegistry();

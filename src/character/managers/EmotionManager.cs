@@ -455,7 +455,8 @@ namespace PPirate.VoxReactor
            // SuperController.LogError("over");
             emotionManager.blushManager.SetMinBlush(value);
             emotionManager.blushManager.CancelPendingDeblush();
-            emotionManager.blushManager.OnBlush();
+            //emotionManager.blushManager.Blush();
+            emotionManager.blushManager.BlushToMinimum();
 
         }
         protected override void DecreaseOverride(float decrement)
