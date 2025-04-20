@@ -116,6 +116,7 @@ namespace PPirate.VoxReactor
 
 
                 blushManager = new BlushManager(character);
+                AddChild(blushManager);
 
                 emotionsConfig = ConfigVoxReactor.singeton.GetCharacterConfig(character).emotionConfig;
 
@@ -456,7 +457,8 @@ namespace PPirate.VoxReactor
             emotionManager.blushManager.SetMinBlush(value);
             emotionManager.blushManager.CancelPendingDeblush();
             //emotionManager.blushManager.Blush();
-            emotionManager.blushManager.BlushToMinimum();
+            //emotionManager.blushManager.BlushToMinimum();
+            emotionManager.blushManager.LerpToMinBLush();
 
         }
         protected override void DecreaseOverride(float decrement)

@@ -25,7 +25,8 @@ namespace PPirate.VoxReactor
             subPannels = new List<UIPannel>()
             {
                 new PannelCharacterClothingSettings(this, character, characterConfig.clothingConfig),
-                new PannelCharacterEmotionSettings(this, character, characterConfig.emotionConfig)
+                new PannelCharacterEmotionSettings(this, character, characterConfig.emotionConfig),
+                new PannelCharacterBlushSettings(this, character, characterConfig.blushConfig),
             };
         }
         public  void SetContainerTabBar(UITabBar containerTabBar)

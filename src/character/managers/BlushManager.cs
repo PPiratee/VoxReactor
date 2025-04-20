@@ -6,7 +6,7 @@ using static MeshVR.PresetManager;
 
 namespace PPirate.VoxReactor
 {
-    internal class BlushManager
+    internal class BlushManager : SafeMvr
     {
         VoxtaCharacter character;
         //todo may glance shy and look away on blush and embarrased
@@ -21,13 +21,12 @@ namespace PPirate.VoxReactor
         private readonly BlushClothingConfig clothingItem2;
 
 
-        readonly float blushDurationMin = 7f;
-        readonly float blushDurationMax = 20f;
-
         readonly AcidGlancePlugin glancePlugin;
 
         private readonly Logger logger;
         private readonly JSONStorableAction OnBlush;
+
+        private readonly ConfigCharacterBlushSettings blushConfig;
 
         public BlushManager(VoxtaCharacter character) {
             logger = new Logger("BlushManager:Char#" + character.characterNumber);
@@ -41,15 +40,26 @@ namespace PPirate.VoxReactor
             clothingItem2 = new BlushClothingConfig("crimeless:face_blushMaterialCombined", this, -0.61f, - 0.365f);
             OnBlush = new JSONStorableAction($"OnBlush_{character.role}", Blush);
             Main.singleton.RegisterAction(OnBlush);
+
+            blushConfig = ConfigVoxReactor.singeton.GetCharacterConfig(character).blushConfig;
+
+             AddCallback(blushConfig.blushEnabled, BlushEnabledToggle);
+        }
+        private void BlushEnabledToggle(bool enabled) {
+            SuperController.LogError("blush enabled: " + enabled);
+            if (!enabled) {
+                isBLushing = false;
+                pendingDeBlush = false;
+                character.main.RemoveFixedDeltaTimeConsumer(BlushUpdate);//might cause problem
+            }
         }
 
         private bool pendingDeBlush = false;
         private bool isBLushing = false;
         public void Blush() {
-           
-           
             logger.StartMethod("OnBlush()");
-            if (isBLushing) {
+            if (isBLushing || !blushConfig.blushEnabled.val)
+            {
                 return;
             }
             glancePlugin.LoadPresetShy();
@@ -61,7 +71,7 @@ namespace PPirate.VoxReactor
 
             StartBlushInterpolating();
 
-            float deblushDelay = UnityEngine.Random.Range(blushDurationMin, blushDurationMax);
+            float deblushDelay = UnityEngine.Random.Range(blushConfig.blushDurationMin.val, blushConfig.blushDurationMax.val);
             pendingDeBlush = true;
             AtomUtils.RunAfterDelay(deblushDelay,() => {
                 if (!pendingDeBlush) {
@@ -73,21 +83,30 @@ namespace PPirate.VoxReactor
             });
 
         }
-        public void BlushToMinimum() {
-            logger.StartMethod("BlushToMinimum()");
-            if (isBLushing)
+        public void SetMinBlush(float minBlush)
+        {
+            if (minBlush == blushTarget)
             {
-                return;
+                blushTarget = minBlush;
             }
-          //  glancePlugin.LoadPresetShy();
-
-            isBLushing = true;
-            currentSpeed = blushSpeed;
-
-            blushTarget = minBlush;
-            StartBlushInterpolating();
+            this.minBlush = minBlush;
         }
+    
         
+        public void LerpToMinBLush()
+        {
+            if (!isBLushing && !pendingDeBlush && blushConfig.blushEnabled.val)
+            {
+                blushTarget = minBlush;
+                StartBlushInterpolating();
+            }
+        }
+
+        public void CancelPendingDeblush()
+        {
+            pendingDeBlush = false;
+        }
+
 
         public void BlushUpdate(float deltaTime) {
            SuperController.LogError("interpoalting");
@@ -117,23 +136,7 @@ namespace PPirate.VoxReactor
             character.main.PushFixedDeltaTimeConsumer(BlushUpdate);
         }
 
-        public void SetMinBlush(float minBlush) {
-            if (minBlush == blushTarget) { 
-                blushTarget = minBlush;
-            }
-            this.minBlush = minBlush;
-        }
-        public void LerpToMinBLush()
-        {
-            if (!isBLushing && !pendingDeBlush) {
-                blushTarget = minBlush;
-                StartBlushInterpolating();
-            }
-        }
-
-        public void CancelPendingDeblush() {
-            pendingDeBlush = false;
-        }
+        
         //todod  glancePlugin.LoadPresetShy();
     
         
