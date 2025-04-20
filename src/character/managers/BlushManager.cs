@@ -12,7 +12,7 @@ namespace PPirate.VoxReactor
         //todo may glance shy and look away on blush and embarrased
 
         readonly float blushSpeed = 0.12f;
-        readonly float deblushSpeed = 0.025f;
+        readonly float deblushSpeed = 0.12f;//0.025f;
         public float currentSpeed;
         public float blushTarget = 0f; //in percent out of 100
 
@@ -45,20 +45,25 @@ namespace PPirate.VoxReactor
             blushConfig = ConfigVoxReactor.singeton.GetCharacterConfig(character).blushConfig;
 
              AddCallback(blushConfig.blushEnabled, BlushEnabledToggle);
+
+            character.main.PushFixedDeltaTimeConsumer(BlushUpdate); //if blushing enable
         }
         private void BlushEnabledToggle(bool enabled) {
             SuperController.LogError("blush enabled: " + enabled);
             if (!enabled) {
                 isBLushing = false;
                 pendingDeBlush = false;
-                character.main.RemoveFixedDeltaTimeConsumer(BlushUpdate);//might cause problem
+                fixedUpdateEnabled = false;
+                //character.main.RemoveFixedDeltaTimeConsumer(BlushUpdate);//might cause problem
             }
         }
 
         private bool pendingDeBlush = false;
         private bool isBLushing = false; // as in blush event, going to the bax blush,
+        bool fixedUpdateEnabled = false;
         public void Blush() {
-            logger.StartMethod("OnBlush()");
+            logger.StartMethod("Blush()");
+            logger.DEBUG("isBLushing: " + isBLushing);
             if (isBLushing || !blushConfig.blushEnabled.val)
             {
                 return;
@@ -66,6 +71,7 @@ namespace PPirate.VoxReactor
             glancePlugin.LoadPresetShy();
 
             isBLushing = true;
+            isDeblushing = false;
             currentSpeed = blushSpeed;
             blushTarget = 100f;
 
@@ -90,36 +96,45 @@ namespace PPirate.VoxReactor
             pendingDeBlush = false;
         }
 
-
+        private bool isDeblushing = false;
         public void BlushUpdate(float deltaTime) {
+            if (!fixedUpdateEnabled) {
+                return;
+            }
           // SuperController.LogError("interpoalting");
             bool isDone = clothingItem1.BlushUpdate(deltaTime);
             bool isDone2 = clothingItem2.BlushUpdate(deltaTime);
 
             if (isDone && isDone2) {
-                /*
-                if (!isBLushing) {
-                    pendingDeBlush = false;
-                    glancePlugin.LoadPresetDefault();
-                }
-                */ //wip
-                isBLushing = false;
-                character.main.RemoveFixedDeltaTimeConsumer(BlushUpdate);
+                
 
-                float deblushDelay = UnityEngine.Random.Range(blushConfig.blushDurationMin.val, blushConfig.blushDurationMax.val);
-                if (pendingDeBlush)
+                
+                
+
+                if (isBLushing)
                 {
+                    SuperController.LogError("DONE DE-BLUSHING");
+                    isBLushing = false;
+
+                    float deblushDelay = UnityEngine.Random.Range(blushConfig.blushDurationMin.val, blushConfig.blushDurationMax.val);
+                    AtomUtils.RunAfterDelay(deblushDelay, () => {
+                        logger.StartMethod("RunAfterDelay deblushing");
+
+                        pendingDeBlush = false;
+                        isDeblushing = true;
+                        currentSpeed = deblushSpeed;
+                        blushTarget = GetMinBlush();
+                        StartBlushInterpolating();
+                    });
+                }
+
+                if (isDeblushing)
+                {
+                    SuperController.LogError("DONE Blushing");
+                    fixedUpdateEnabled = false;
+                    isDeblushing = false;
                     return;
                 }
-                pendingDeBlush = true;
-                AtomUtils.RunAfterDelay(deblushDelay, () => {
-                    logger.StartMethod("RunAfterDelay deblushing");
-                    
-                    pendingDeBlush = false;
-                    currentSpeed = deblushSpeed;
-                    blushTarget = GetMinBlush();
-                    StartBlushInterpolating();
-                });
             }
         }
        
@@ -133,7 +148,8 @@ namespace PPirate.VoxReactor
             clothingItem1.UpdateInterpolationValue();
             clothingItem2.UpdateInterpolationValue();
 
-            character.main.PushFixedDeltaTimeConsumer(BlushUpdate);
+            fixedUpdateEnabled = true;
+           // character.main.PushFixedDeltaTimeConsumer(BlushUpdate);
         }
 
         
@@ -178,7 +194,8 @@ namespace PPirate.VoxReactor
                 {
                     SuperController.LogError("BlushManager - Unable to find the clothing item: " + storableId);
                 }
-                interpolationStartingValue = clothing.GetFloatParamValue("Alpha Adjust");
+                clothing.SetFloatParamValue("Alpha Adjust", alphaNoBlush);
+                interpolationStartingValue = alphaNoBlush;
             }
 
             public void UpdateInterpolationValue() {

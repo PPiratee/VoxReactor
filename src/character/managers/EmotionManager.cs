@@ -446,6 +446,7 @@ namespace PPirate.VoxReactor
     internal class Embarrassment : Emotion
     {
         public static string embarrassmentName = "embarrassed";
+        private readonly ConfigCharacterBlushSettings blushConfig;
 
         public Embarrassment(EmotionManager emotionManager) : base(emotionManager, embarrassmentName, 0)
         {
@@ -453,14 +454,17 @@ namespace PPirate.VoxReactor
         }
         protected override void IncreaseOverride(float increment)
         {
-
-            emotionManager.blushManager.CancelPendingDeblush();
-            emotionManager.blushManager.LerpToMinBLush();
-
+            if (blushConfig.emotionEmbarrasedSetsMinimumBLush.val) { 
+                emotionManager.blushManager.CancelPendingDeblush();
+                emotionManager.blushManager.LerpToMinBLush();
+            }
         }
         protected override void DecreaseOverride(float decrement)
         {
-            emotionManager.blushManager.LerpToMinBLush();
+            if (blushConfig.emotionEmbarrasedSetsMinimumBLush.val)
+            {
+                emotionManager.blushManager.LerpToMinBLush();
+            }
         }
         public override bool ShouldShowInContext()
         {
