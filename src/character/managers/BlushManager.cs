@@ -137,6 +137,7 @@ namespace PPirate.VoxReactor
                     logger.LOG("DONE De-Blushing");
                     fixedUpdateEnabled = false;
                     isDeblushing = false;
+                    glancePlugin.LoadPresetDefault();
                     return;
                 }
             }
