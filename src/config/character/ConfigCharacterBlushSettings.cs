@@ -5,8 +5,14 @@ namespace PPirate.VoxReactor
     internal class ConfigCharacterBlushSettings : ConfigInstanceStorable
     {
         public readonly JSONStorableBool blushEnabled;
-        public readonly JSONStorableBool emotionEmbarrasedSetsMinimumBLush;
-        public readonly JSONStorableBool emotionHornySetsMinimumBlush;
+
+        public readonly JSONStorableBool emotionEmbarrasedSetsMinBlush;
+        public readonly JSONStorableBool emotionHornySetsMinBlush;
+        public readonly JSONStorableBool bodyLanguageStimulationSetsMinBlush;
+
+        public readonly JSONStorableFloat blushSpeed;
+        public readonly JSONStorableFloat deBlushSpeed;
+
         public readonly JSONStorableFloat blushDurationMin;
         public readonly JSONStorableFloat blushDurationMax;
 
@@ -15,17 +21,27 @@ namespace PPirate.VoxReactor
             blushEnabled = new JSONStorableBool(GetStorableId("BlushEnabled"), true);
             Main.singleton.RegisterBool(blushEnabled);
 
-            emotionEmbarrasedSetsMinimumBLush = new JSONStorableBool(GetStorableId("EmotionEmbarrasedSetsMinimumBLush"), true);
-            Main.singleton.RegisterBool(emotionEmbarrasedSetsMinimumBLush);
+            emotionEmbarrasedSetsMinBlush = new JSONStorableBool(GetStorableId("EmotionEmbarrasedSetsMinBLush"), true);
+            Main.singleton.RegisterBool(emotionEmbarrasedSetsMinBlush);
 
-            emotionHornySetsMinimumBlush = new JSONStorableBool(GetStorableId("EmotionHornySetsMinimumBLush"), false);
-            Main.singleton.RegisterBool(emotionHornySetsMinimumBlush);
+            emotionHornySetsMinBlush = new JSONStorableBool(GetStorableId("EmotionHornySetsMinBLush"), false);
+            Main.singleton.RegisterBool(emotionHornySetsMinBlush);
 
-            blushDurationMin = new JSONStorableFloat(GetStorableId("BlushDurationMin"), 0f, 0, 60, true, true);
+            bodyLanguageStimulationSetsMinBlush = new JSONStorableBool(GetStorableId("BodyLanguageStimulationSetsMinBlush"), true);
+            Main.singleton.RegisterBool(bodyLanguageStimulationSetsMinBlush);
+
+            blushDurationMin = new JSONStorableFloat(GetStorableId("BlushDurationMin"), 7, 0, 60, true, true);
             Main.singleton.RegisterFloat(blushDurationMin);
 
-            blushDurationMax = new JSONStorableFloat(GetStorableId("BlushDurationMax"), 0f, 0, 60, true, true);
+            blushDurationMax = new JSONStorableFloat(GetStorableId("BlushDurationMax"), 20, 0, 60, true, true);
             Main.singleton.RegisterFloat(blushDurationMax);
+
+
+            blushSpeed = new JSONStorableFloat(GetStorableId("blushSpeed"), 1.2f, 0, 2, true, true);
+            Main.singleton.RegisterFloat(blushSpeed);
+
+            deBlushSpeed = new JSONStorableFloat(GetStorableId("deBlushSpeed"), 0.25f, 0, 2, true, true);
+            Main.singleton.RegisterFloat(deBlushSpeed);
         }
     }
 }

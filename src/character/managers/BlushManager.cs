@@ -11,8 +11,6 @@ namespace PPirate.VoxReactor
         VoxtaCharacter character;
         //todo may glance shy and look away on blush and embarrased
 
-        readonly float blushSpeed = 0.12f;
-        readonly float deblushSpeed = 0.12f;//0.025f;
         public float currentSpeed;
         public float blushTarget = 0f; //in percent out of 100
 
@@ -30,26 +28,30 @@ namespace PPirate.VoxReactor
         private readonly ConfigCharacterBlushSettings blushConfig;
 
         public BlushManager(VoxtaCharacter character) {
-            logger = new Logger("BlushManager:Char#" + character.characterNumber, 0);
+            logger = new Logger("BlushManager:Char#" + character.characterNumber);
             logger.Constructor();
 
             this.character = character;
             glancePlugin = character.plugins.glancePlugin;
-  
 
-            clothingItem1 = new BlushClothingConfig("VRDollz:Makeup Blush2 VRDMaterialFace", this, - 1.0f, -0.75f);
-            clothingItem2 = new BlushClothingConfig("crimeless:face_blushMaterialCombined", this, -0.61f, - 0.365f);
+
+            clothingItem1 = new BlushClothingConfig("VRDollz:Makeup Blush2 VRDMaterialFace", this, -1.0f, -0.75f);
+            clothingItem2 = new BlushClothingConfig("crimeless:face_blushMaterialCombined", this, -0.61f, -0.365f);
             OnBlush = new JSONStorableAction($"OnBlush_{character.role}", Blush);
             Main.singleton.RegisterAction(OnBlush);
 
             blushConfig = ConfigVoxReactor.singeton.GetCharacterConfig(character).blushConfig;
 
-             AddCallback(blushConfig.blushEnabled, BlushEnabledToggle);
+            AddCallback(blushConfig.blushEnabled, BlushEnabledToggle);
+
+            AddCallback(character.plugins.readMyLipsPlugin.GetStimulationStorable(), OnStimulationChange);
 
             character.main.PushFixedDeltaTimeConsumer(BlushUpdate); //if blushing enable
+            glancePlugin.LoadPresetDefault();
+
         }
         private void BlushEnabledToggle(bool enabled) {
-            SuperController.LogError("blush enabled: " + enabled);
+            logger.LOG("blush enabled: " + enabled);
             if (!enabled) {
                 isBLushing = false;
                 pendingDeBlush = false;
@@ -72,7 +74,7 @@ namespace PPirate.VoxReactor
 
             isBLushing = true;
             isDeblushing = false;
-            currentSpeed = blushSpeed;
+            currentSpeed = blushConfig.blushSpeed.val /10f;
             blushTarget = 100f;
 
 
@@ -80,19 +82,19 @@ namespace PPirate.VoxReactor
 
         }
 
-    
-        
+
+
         public void LerpToMinBLush()
         {
             logger.StartMethod("LerpToMinBLush()");
             logger.DEBUG("isBLushing: " + isBLushing);
-            if (isBLushing || !blushConfig.blushEnabled.val)
+            if (isBLushing || isDeblushing || !blushConfig.blushEnabled.val)
             {
                 return;
             }
             isBLushing = true;
             isDeblushing = false;
-            currentSpeed = blushSpeed;
+            currentSpeed = blushConfig.deBlushSpeed.val / 10f;
 
             blushTarget = GetMinBlush();
             StartBlushInterpolating();
@@ -115,7 +117,7 @@ namespace PPirate.VoxReactor
 
                 if (isBLushing)
                 {
-                    SuperController.LogError("DONE DE-BLUSHING");
+                    logger.LOG("DONE BLUSHING");
                     isBLushing = false;
 
                     float deblushDelay = UnityEngine.Random.Range(blushConfig.blushDurationMin.val, blushConfig.blushDurationMax.val);
@@ -124,7 +126,7 @@ namespace PPirate.VoxReactor
 
                         pendingDeBlush = false;
                         isDeblushing = true;
-                        currentSpeed = deblushSpeed;
+                        currentSpeed = blushConfig.deBlushSpeed.val / 10;
                         blushTarget = GetMinBlush();
                         StartBlushInterpolating();
                     });
@@ -132,15 +134,15 @@ namespace PPirate.VoxReactor
 
                 if (isDeblushing)
                 {
-                    SuperController.LogError("DONE Blushing");
+                    logger.LOG("DONE De-Blushing");
                     fixedUpdateEnabled = false;
                     isDeblushing = false;
                     return;
                 }
             }
         }
-       
-       
+
+
         private void StartBlushInterpolating() {
             logger.StartMethod("StartBlushInterpolating()");
             clothingItem1.SetTimeInterpolating(0.0f);
@@ -151,37 +153,24 @@ namespace PPirate.VoxReactor
             clothingItem2.UpdateInterpolationValue();
 
             fixedUpdateEnabled = true;
-           // character.main.PushFixedDeltaTimeConsumer(BlushUpdate);
+            // character.main.PushFixedDeltaTimeConsumer(BlushUpdate);
         }
 
-        
-        //todod  glancePlugin.LoadPresetShy();
-    
-        
-        private void GlanceDefaults()
-        {
-            if (glancePlugin.CurrentPreset == AcidGlancePlugin.GLANCE_PRESET_SHY)
-            {
-                glancePlugin.LoadPresetDefault();
+        private void OnStimulationChange(float stimulation) {
+            if (!blushConfig.bodyLanguageStimulationSetsMinBlush.val) {
+                return;
             }
+
+            LerpToMinBLush();
         }
+       
         private float GetMinBlush()
         {
-            //float embarrasement = character.emotionManager.embarrasement.value;
-            bool useEmbarrass = blushConfig.emotionEmbarrasedSetsMinimumBLush.val;
-            bool useHorny = blushConfig.emotionHornySetsMinimumBlush.val;
+            float embarass = blushConfig.emotionEmbarrasedSetsMinBlush.val ? character.emotionManager.embarrasement.value : 0;
+            float horny = blushConfig.emotionHornySetsMinBlush.val ? character.emotionManager.hornieness.value : 0;
+            float stimulation = blushConfig.bodyLanguageStimulationSetsMinBlush.val ? character.plugins.readMyLipsPlugin.GetStimulationValue() * 100 : 0;
 
-            float embarass = character.emotionManager.embarrasement.value;
-            float horny = character.emotionManager.hornieness.value;
-
-            if (useEmbarrass && useHorny) {
-                return Mathf.Max(embarass, horny);
-            } else if (useEmbarrass) {
-                return embarass;
-            } else if (useHorny) {
-                return horny;
-            }
-            return 0;
+            return Mathf.Max(stimulation, Mathf.Max(embarass, horny));
         }
         internal class BlushClothingConfig {
             private readonly string storableId;
@@ -220,10 +209,10 @@ namespace PPirate.VoxReactor
                 clothing.SetFloatParamValue("Alpha Adjust", blush1NewAlpha);
 
                 bool isDone = IsDone(blush1NewAlpha);
-                if (!isDone) { 
-                
-                    SuperController.LogError("current alpha: "+ clothing.GetFloatParamValue("Alpha Adjust"));
-                    SuperController.LogError("target: " + targetAlpha);
+                if (!isDone) {
+
+                    blushManager.logger.DEBUG("current alpha: "+ clothing.GetFloatParamValue("Alpha Adjust"));
+                    blushManager.logger.DEBUG("target: " + targetAlpha);
                 }
 
                 return isDone;

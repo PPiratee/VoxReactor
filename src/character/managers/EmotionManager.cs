@@ -449,14 +449,14 @@ namespace PPirate.VoxReactor
         }
         protected override void IncreaseOverride(float increment)
         {
-            if (blushConfig.emotionEmbarrasedSetsMinimumBLush.val) { 
+            if (blushConfig.emotionEmbarrasedSetsMinBlush.val) { 
                 emotionManager.blushManager.CancelPendingDeblush();
                 emotionManager.blushManager.LerpToMinBLush();
             }
         }
         protected override void DecreaseOverride(float decrement)
         {
-            if (blushConfig.emotionEmbarrasedSetsMinimumBLush.val)
+            if (blushConfig.emotionEmbarrasedSetsMinBlush.val)
             {
                 emotionManager.blushManager.LerpToMinBLush();
             }
@@ -477,7 +477,7 @@ namespace PPirate.VoxReactor
         }
         protected override void IncreaseOverride(float increment)
         {
-            if (blushConfig.emotionHornySetsMinimumBlush.val)
+            if (blushConfig.emotionHornySetsMinBlush.val)
             {
                 emotionManager.blushManager.CancelPendingDeblush();
                 emotionManager.blushManager.LerpToMinBLush();
@@ -485,7 +485,7 @@ namespace PPirate.VoxReactor
         }
         protected override void DecreaseOverride(float decrement)
         {
-            if (blushConfig.emotionHornySetsMinimumBlush.val)
+            if (blushConfig.emotionHornySetsMinBlush.val)
             {
                 emotionManager.blushManager.LerpToMinBLush();
             }
