@@ -447,26 +447,20 @@ namespace PPirate.VoxReactor
     {
         public static string embarrassmentName = "embarrassed";
 
-        public Embarrassment(EmotionManager emotionManager) : base(emotionManager, embarrassmentName, 35f)
+        public Embarrassment(EmotionManager emotionManager) : base(emotionManager, embarrassmentName, 0)
         {
             this.isNegativeEmotion = true;
         }
         protected override void IncreaseOverride(float increment)
         {
-           // SuperController.LogError("over");
-            emotionManager.blushManager.SetMinBlush(value);
+
             emotionManager.blushManager.CancelPendingDeblush();
-            //emotionManager.blushManager.Blush();
-            //emotionManager.blushManager.BlushToMinimum();
             emotionManager.blushManager.LerpToMinBLush();
 
         }
         protected override void DecreaseOverride(float decrement)
         {
-            emotionManager.blushManager.SetMinBlush(value);
             emotionManager.blushManager.LerpToMinBLush();
-         
-
         }
         public override bool ShouldShowInContext()
         {

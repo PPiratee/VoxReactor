@@ -22,10 +22,11 @@ namespace PPirate.VoxReactor
             ClearPannelUI();
             MakeBackButton();
 
-            var contextEnabledToggle = (UIDynamicToggle)blushConfig.blushEnabled.CreateUI(uiElements, false);
-            contextEnabledToggle.label = "Enable Blushing";
+            var toggle = (UIDynamicToggle)blushConfig.blushEnabled.CreateUI(uiElements, false);
+            toggle.label = "Enable Blushing";
 
-
+            toggle = (UIDynamicToggle)blushConfig.emotionEmbarrasedSetsMinimumBLush.CreateUI(uiElements, false);
+            toggle.label = "Embarrassment sets minimum";
 
             var slider = (UIDynamicSlider)blushConfig.blushDurationMin.CreateUI(uiElements, false);
             slider.label = $"BlushDurationMin (seconds)";
@@ -33,6 +34,12 @@ namespace PPirate.VoxReactor
             slider = (UIDynamicSlider)blushConfig.blushDurationMax.CreateUI(uiElements, false);
             slider.label = $"BlushDurationMax (seconds)";
 
+            string info = @"BlushDuration: When a blush event occurs, it will blush the character to maximum. Blush duration sets the time to remain at that maximum before de-blushing.
+
+Embarrassment sets minimum: If the embarrassed emotion is 100% then the character will be fully blushed: 0% hs no blush.
+This is line three.";
+
+            info.CreateStaticInfo(600, uiElements, false);
         }
     }
 }

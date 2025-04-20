@@ -15,7 +15,8 @@ namespace PPirate.VoxReactor
         readonly float deblushSpeed = 0.025f;
         public float currentSpeed;
         public float blushTarget = 0f; //in percent out of 100
-        private float minBlush = 0f; //in percent out of 100
+
+
 
         private readonly BlushClothingConfig clothingItem1;
         private readonly BlushClothingConfig clothingItem2;
@@ -29,7 +30,7 @@ namespace PPirate.VoxReactor
         private readonly ConfigCharacterBlushSettings blushConfig;
 
         public BlushManager(VoxtaCharacter character) {
-            logger = new Logger("BlushManager:Char#" + character.characterNumber);
+            logger = new Logger("BlushManager:Char#" + character.characterNumber, 0);
             logger.Constructor();
 
             this.character = character;
@@ -71,35 +72,15 @@ namespace PPirate.VoxReactor
 
             StartBlushInterpolating();
 
-            /*
-            float deblushDelay = UnityEngine.Random.Range(blushConfig.blushDurationMin.val, blushConfig.blushDurationMax.val);
-            pendingDeBlush = true;
-            AtomUtils.RunAfterDelay(deblushDelay,() => {
-                if (!pendingDeBlush) {
-                    return;
-                }
-                currentSpeed = deblushSpeed;
-                blushTarget = minBlush;
-                StartBlushInterpolating();
-            });
-            */ //wip
+        }
 
-        }
-        public void SetMinBlush(float minBlush)
-        {
-            if (minBlush == blushTarget)
-            {
-                blushTarget = minBlush;
-            }
-            this.minBlush = minBlush;
-        }
     
         
         public void LerpToMinBLush()
         {
             if (!isBLushing && !pendingDeBlush && blushConfig.blushEnabled.val)
             {
-                blushTarget = minBlush;
+                blushTarget = GetMinBlush();
                 StartBlushInterpolating();
             }
         }
@@ -111,7 +92,7 @@ namespace PPirate.VoxReactor
 
 
         public void BlushUpdate(float deltaTime) {
-           SuperController.LogError("interpoalting");
+          // SuperController.LogError("interpoalting");
             bool isDone = clothingItem1.BlushUpdate(deltaTime);
             bool isDone2 = clothingItem2.BlushUpdate(deltaTime);
 
@@ -126,15 +107,17 @@ namespace PPirate.VoxReactor
                 character.main.RemoveFixedDeltaTimeConsumer(BlushUpdate);
 
                 float deblushDelay = UnityEngine.Random.Range(blushConfig.blushDurationMin.val, blushConfig.blushDurationMax.val);
+                if (pendingDeBlush)
+                {
+                    return;
+                }
                 pendingDeBlush = true;
                 AtomUtils.RunAfterDelay(deblushDelay, () => {
-                    if (!pendingDeBlush)
-                    {
-                        return;
-                    }
+                    logger.StartMethod("RunAfterDelay deblushing");
+                    
                     pendingDeBlush = false;
                     currentSpeed = deblushSpeed;
-                    blushTarget = minBlush;
+                    blushTarget = GetMinBlush();
                     StartBlushInterpolating();
                 });
             }
@@ -163,6 +146,17 @@ namespace PPirate.VoxReactor
             {
                 glancePlugin.LoadPresetDefault();
             }
+        }
+        private float GetMinBlush()
+        {
+            //float embarrasement = character.emotionManager.embarrasement.value;
+
+            if (blushConfig.emotionEmbarrasedSetsMinimumBLush.val) { 
+                return character.emotionManager.embarrasement.value;
+            }
+
+            //float hornyNess = character.emotionManager.embarrasement.value;
+            return 0;
         }
         internal class BlushClothingConfig {
             private readonly string storableId;
@@ -193,15 +187,20 @@ namespace PPirate.VoxReactor
 
             public bool BlushUpdate(float deltaTime)
             {
-                SuperController.LogError("current alpha: "+ clothing.GetFloatParamValue("Alpha Adjust"));
 
                 float targetAlpha = SimpleLerp(alphaNoBlush, alphaFullBlush, blushManager.blushTarget);
-                SuperController.LogError("target: " + targetAlpha);
                 float blush1NewAlpha = LerpWithSpeed(interpolationStartingValue, targetAlpha, blushManager.currentSpeed, deltaTime);
 
                 clothing.SetFloatParamValue("Alpha Adjust", blush1NewAlpha);
- 
-                return IsDone(blush1NewAlpha);
+
+                bool isDone = IsDone(blush1NewAlpha);
+                if (!isDone) { 
+                
+                    SuperController.LogError("current alpha: "+ clothing.GetFloatParamValue("Alpha Adjust"));
+                    SuperController.LogError("target: " + targetAlpha);
+                }
+
+                return isDone;
             }
             public bool IsDone(float newAlpha)
             {
@@ -251,6 +250,7 @@ namespace PPirate.VoxReactor
             {
                 return (value - min) / (max - min) * 100;
             }
+            
 
         }
     }
