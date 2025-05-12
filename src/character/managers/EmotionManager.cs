@@ -13,9 +13,7 @@ namespace PPirate.VoxReactor
 {
     internal class EmotionManager: SafeMvr
     {
-        private Logger logger;
-
-       
+        public Logger logger;
 
 
         private bool emotionsEnabled = true;
@@ -26,9 +24,6 @@ namespace PPirate.VoxReactor
         private readonly int incrementSadness = 10;
         private readonly int incrementAnger = 10;
         private readonly int incremenEmbarrassment = 10;
-
-
-
 
 
         List<Emotion> mainEmotions = new List<Emotion>(); // only context on the strongest will be provided
@@ -116,6 +111,7 @@ namespace PPirate.VoxReactor
 
 
                 blushManager = new BlushManager(character);
+                AddChild(blushManager);
 
                 emotionsConfig = ConfigVoxReactor.singeton.GetCharacterConfig(character).emotionConfig;
 
@@ -276,7 +272,7 @@ namespace PPirate.VoxReactor
         protected EmotionManager emotionManager;
         public readonly string name;
         public float value;
-        public bool isNegativeEmotion = false;
+
         
 
         public Emotion(EmotionManager emotionManager, string name, float startingValue) {
@@ -288,6 +284,7 @@ namespace PPirate.VoxReactor
         
 
         public void Increase(float increment, bool effectOtherEmotions = true) {
+            emotionManager.logger.StartMethod("EmotionIncrease " + this.name);
             value = BindPercent(value, increment);
             IncreaseOverride(increment);
             if(effectOtherEmotions)
@@ -406,7 +403,7 @@ namespace PPirate.VoxReactor
 
         public Sadness(EmotionManager emotionManager) : base(emotionManager, sadnessName, 0f)
         {
-            this.isNegativeEmotion = true;
+
         }
         protected override void IncreaseOverride(float increment)
         {
@@ -427,7 +424,6 @@ namespace PPirate.VoxReactor
         public static string angerName = "angry";
         public Anger(EmotionManager emotionManager) : base(emotionManager, angerName, 0f)
         {
-            this.isNegativeEmotion = true;
         }
         protected override void IncreaseOverride(float increment)
         {
@@ -445,26 +441,25 @@ namespace PPirate.VoxReactor
     internal class Embarrassment : Emotion
     {
         public static string embarrassmentName = "embarrassed";
+        private readonly ConfigCharacterBlushSettings blushConfig;
 
-        public Embarrassment(EmotionManager emotionManager) : base(emotionManager, embarrassmentName, 35f)
+        public Embarrassment(EmotionManager emotionManager) : base(emotionManager, embarrassmentName, 0)
         {
-            this.isNegativeEmotion = true;
+            this.blushConfig = emotionManager.character.myConfig.blushConfig;
         }
         protected override void IncreaseOverride(float increment)
         {
-           // SuperController.LogError("over");
-            emotionManager.blushManager.SetMinBlush(value);
-            emotionManager.blushManager.CancelPendingDeblush();
-            //emotionManager.blushManager.Blush();
-            emotionManager.blushManager.BlushToMinimum();
-
+            if (blushConfig.emotionEmbarrasedSetsMinBlush.val) { 
+                emotionManager.blushManager.CancelPendingDeblush();
+                emotionManager.blushManager.LerpToMinBLush();
+            }
         }
         protected override void DecreaseOverride(float decrement)
         {
-            emotionManager.blushManager.SetMinBlush(value);
-            emotionManager.blushManager.LerpToMinBLush();
-         
-
+            if (blushConfig.emotionEmbarrasedSetsMinBlush.val)
+            {
+                emotionManager.blushManager.LerpToMinBLush();
+            }
         }
         public override bool ShouldShowInContext()
         {
@@ -475,18 +470,25 @@ namespace PPirate.VoxReactor
     {
         public static string hornieNessName = "horny";
 
-
+        private readonly ConfigCharacterBlushSettings blushConfig;
         public Hornieness(EmotionManager emotionManager) : base(emotionManager, hornieNessName, 20f)
         {
-
+            this.blushConfig = emotionManager.character.myConfig.blushConfig;
         }
         protected override void IncreaseOverride(float increment)
         {
-
+            if (blushConfig.emotionHornySetsMinBlush.val)
+            {
+                emotionManager.blushManager.CancelPendingDeblush();
+                emotionManager.blushManager.LerpToMinBLush();
+            }
         }
         protected override void DecreaseOverride(float decrement)
         {
-
+            if (blushConfig.emotionHornySetsMinBlush.val)
+            {
+                emotionManager.blushManager.LerpToMinBLush();
+            }
         }
         public override void ApplyExpression()
         {

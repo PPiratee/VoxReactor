@@ -57,9 +57,11 @@ src\UI\pannels\character\PannelCharacter.cs
 src\UI\pannels\character\PannelCharacterClothingSettings.cs
 src\UI\pannels\character\PannelCharacterEmotionSettings.cs
 src\UI\pannels\character\PannelCharacterSpecificEmotionSettings.cs
+src\UI\pannels\character\PannelCharacterBlushSettings.cs
 src\config\ConfigVoxReactor.cs
 src\config\ConfigInstanceStorable.cs
 src\config\character\ConfigCharacterBase.cs
 src\config\character\ConfigCharacterClothing.cs
 src\config\character\ConfigCharacterEmotions.cs
 src\config\character\ConfigCharacterSpecificEmotion.cs
+src\config\character\ConfigCharacterBlushSettings.cs

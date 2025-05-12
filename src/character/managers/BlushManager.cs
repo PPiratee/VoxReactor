@@ -6,28 +6,26 @@ using static MeshVR.PresetManager;
 
 namespace PPirate.VoxReactor
 {
-    internal class BlushManager
+    internal class BlushManager : SafeMvr
     {
         VoxtaCharacter character;
         //todo may glance shy and look away on blush and embarrased
 
-        readonly float blushSpeed = 0.12f;
-        readonly float deblushSpeed = 0.025f;
         public float currentSpeed;
         public float blushTarget = 0f; //in percent out of 100
-        private float minBlush = 0f; //in percent out of 100
+
+
 
         private readonly BlushClothingConfig clothingItem1;
         private readonly BlushClothingConfig clothingItem2;
 
 
-        readonly float blushDurationMin = 7f;
-        readonly float blushDurationMax = 20f;
-
         readonly AcidGlancePlugin glancePlugin;
 
         private readonly Logger logger;
         private readonly JSONStorableAction OnBlush;
+
+        private readonly ConfigCharacterBlushSettings blushConfig;
 
         public BlushManager(VoxtaCharacter character) {
             logger = new Logger("BlushManager:Char#" + character.characterNumber);
@@ -35,76 +33,117 @@ namespace PPirate.VoxReactor
 
             this.character = character;
             glancePlugin = character.plugins.glancePlugin;
-  
 
-            clothingItem1 = new BlushClothingConfig("VRDollz:Makeup Blush2 VRDMaterialFace", this, - 1.0f, -0.75f);
-            clothingItem2 = new BlushClothingConfig("crimeless:face_blushMaterialCombined", this, -0.61f, - 0.365f);
+
+            clothingItem1 = new BlushClothingConfig("VRDollz:Makeup Blush2 VRDMaterialFace", this, -1.0f, -0.75f);
+            clothingItem2 = new BlushClothingConfig("crimeless:face_blushMaterialCombined", this, -0.61f, -0.365f);
             OnBlush = new JSONStorableAction($"OnBlush_{character.role}", Blush);
             Main.singleton.RegisterAction(OnBlush);
+
+            blushConfig = ConfigVoxReactor.singeton.GetCharacterConfig(character).blushConfig;
+
+            AddCallback(blushConfig.blushEnabled, BlushEnabledToggle);
+
+            AddCallback(character.plugins.readMyLipsPlugin.GetStimulationStorable(), OnStimulationChange);
+
+            character.main.PushFixedDeltaTimeConsumer(BlushUpdate); //if blushing enable
+            glancePlugin.LoadPresetDefault();
+
+        }
+        private void BlushEnabledToggle(bool enabled) {
+            logger.LOG("blush enabled: " + enabled);
+            if (!enabled) {
+                isBLushing = false;
+                pendingDeBlush = false;
+                fixedUpdateEnabled = false;
+                //character.main.RemoveFixedDeltaTimeConsumer(BlushUpdate);//might cause problem
+            }
         }
 
         private bool pendingDeBlush = false;
-        private bool isBLushing = false;
+        private bool isBLushing = false; // as in blush event, going to the bax blush,
+        bool fixedUpdateEnabled = false;
         public void Blush() {
-           
-           
-            logger.StartMethod("OnBlush()");
-            if (isBLushing) {
+            logger.StartMethod("Blush()");
+            logger.DEBUG("isBLushing: " + isBLushing);
+            if (isBLushing || !blushConfig.blushEnabled.val)
+            {
                 return;
             }
             glancePlugin.LoadPresetShy();
 
             isBLushing = true;
-            currentSpeed = blushSpeed;
+            isDeblushing = false;
+            currentSpeed = blushConfig.blushSpeed.val /10f;
             blushTarget = 100f;
 
 
             StartBlushInterpolating();
 
-            float deblushDelay = UnityEngine.Random.Range(blushDurationMin, blushDurationMax);
-            pendingDeBlush = true;
-            AtomUtils.RunAfterDelay(deblushDelay,() => {
-                if (!pendingDeBlush) {
-                    return;
-                }
-                currentSpeed = deblushSpeed;
-                blushTarget = minBlush;
-                StartBlushInterpolating();
-            });
-
         }
-        public void BlushToMinimum() {
-            logger.StartMethod("BlushToMinimum()");
-            if (isBLushing)
+
+
+
+        public void LerpToMinBLush()
+        {
+            logger.StartMethod("LerpToMinBLush()");
+            logger.DEBUG("isBLushing: " + isBLushing);
+            if (isBLushing || isDeblushing || !blushConfig.blushEnabled.val)
             {
                 return;
             }
-          //  glancePlugin.LoadPresetShy();
-
             isBLushing = true;
-            currentSpeed = blushSpeed;
+            isDeblushing = false;
+            currentSpeed = blushConfig.deBlushSpeed.val / 10f;
 
-            blushTarget = minBlush;
+            blushTarget = GetMinBlush();
             StartBlushInterpolating();
         }
-        
 
+        public void CancelPendingDeblush()
+        {
+            pendingDeBlush = false;
+        }
+
+        private bool isDeblushing = false;
         public void BlushUpdate(float deltaTime) {
-           SuperController.LogError("interpoalting");
+            if (!fixedUpdateEnabled) {
+                return;
+            }
             bool isDone = clothingItem1.BlushUpdate(deltaTime);
             bool isDone2 = clothingItem2.BlushUpdate(deltaTime);
 
             if (isDone && isDone2) {
-                if (!isBLushing) {
-                    pendingDeBlush = false;
-                    glancePlugin.LoadPresetDefault();
+
+                if (isBLushing)
+                {
+                    logger.LOG("DONE BLUSHING");
+                    isBLushing = false;
+
+                    float deblushDelay = UnityEngine.Random.Range(blushConfig.blushDurationMin.val, blushConfig.blushDurationMax.val);
+                    AtomUtils.RunAfterDelay(deblushDelay, () => {
+                        logger.StartMethod("RunAfterDelay deblushing");
+
+                        pendingDeBlush = false;
+                        isDeblushing = true;
+                        currentSpeed = blushConfig.deBlushSpeed.val / 10;
+                        blushTarget = GetMinBlush();
+                        StartBlushInterpolating();
+                    });
                 }
-                isBLushing = false;
-                character.main.RemoveFixedDeltaTimeConsumer(BlushUpdate);
+
+                if (isDeblushing)
+                {
+                    logger.LOG("DONE De-Blushing");
+                    fixedUpdateEnabled = false;
+                    isDeblushing = false;
+                    glancePlugin.LoadPresetDefault();
+                    return;
+                }
             }
         }
-       
-       
+
+
         private void StartBlushInterpolating() {
             logger.StartMethod("StartBlushInterpolating()");
             clothingItem1.SetTimeInterpolating(0.0f);
@@ -114,35 +153,25 @@ namespace PPirate.VoxReactor
             clothingItem1.UpdateInterpolationValue();
             clothingItem2.UpdateInterpolationValue();
 
-            character.main.PushFixedDeltaTimeConsumer(BlushUpdate);
+            fixedUpdateEnabled = true;
+            // character.main.PushFixedDeltaTimeConsumer(BlushUpdate);
         }
 
-        public void SetMinBlush(float minBlush) {
-            if (minBlush == blushTarget) { 
-                blushTarget = minBlush;
+        private void OnStimulationChange(float stimulation) {
+            if (!blushConfig.bodyLanguageStimulationSetsMinBlush.val) {
+                return;
             }
-            this.minBlush = minBlush;
-        }
-        public void LerpToMinBLush()
-        {
-            if (!isBLushing && !pendingDeBlush) {
-                blushTarget = minBlush;
-                StartBlushInterpolating();
-            }
-        }
 
-        public void CancelPendingDeblush() {
-            pendingDeBlush = false;
+            LerpToMinBLush();
         }
-        //todod  glancePlugin.LoadPresetShy();
-    
-        
-        private void GlanceDefaults()
+       
+        private float GetMinBlush()
         {
-            if (glancePlugin.CurrentPreset == AcidGlancePlugin.GLANCE_PRESET_SHY)
-            {
-                glancePlugin.LoadPresetDefault();
-            }
+            float embarass = blushConfig.emotionEmbarrasedSetsMinBlush.val ? character.emotionManager.embarrasement.value : 0;
+            float horny = blushConfig.emotionHornySetsMinBlush.val ? character.emotionManager.hornieness.value : 0;
+            float stimulation = blushConfig.bodyLanguageStimulationSetsMinBlush.val ? character.plugins.readMyLipsPlugin.GetStimulationValue() * 100 : 0;
+
+            return Mathf.Max(stimulation, Mathf.Max(embarass, horny));
         }
         internal class BlushClothingConfig {
             private readonly string storableId;
@@ -164,7 +193,8 @@ namespace PPirate.VoxReactor
                 {
                     SuperController.LogError("BlushManager - Unable to find the clothing item: " + storableId);
                 }
-                interpolationStartingValue = clothing.GetFloatParamValue("Alpha Adjust");
+                clothing.SetFloatParamValue("Alpha Adjust", alphaNoBlush);
+                interpolationStartingValue = alphaNoBlush;
             }
 
             public void UpdateInterpolationValue() {
@@ -173,15 +203,20 @@ namespace PPirate.VoxReactor
 
             public bool BlushUpdate(float deltaTime)
             {
-                SuperController.LogError("current alpha: "+ clothing.GetFloatParamValue("Alpha Adjust"));
 
                 float targetAlpha = SimpleLerp(alphaNoBlush, alphaFullBlush, blushManager.blushTarget);
-                SuperController.LogError("target: " + targetAlpha);
                 float blush1NewAlpha = LerpWithSpeed(interpolationStartingValue, targetAlpha, blushManager.currentSpeed, deltaTime);
 
                 clothing.SetFloatParamValue("Alpha Adjust", blush1NewAlpha);
- 
-                return IsDone(blush1NewAlpha);
+
+                bool isDone = IsDone(blush1NewAlpha);
+                if (!isDone) {
+
+                    blushManager.logger.DEBUG("current alpha: "+ clothing.GetFloatParamValue("Alpha Adjust"));
+                    blushManager.logger.DEBUG("target: " + targetAlpha);
+                }
+
+                return isDone;
             }
             public bool IsDone(float newAlpha)
             {
@@ -231,6 +266,7 @@ namespace PPirate.VoxReactor
             {
                 return (value - min) / (max - min) * 100;
             }
+            
 
         }
     }
