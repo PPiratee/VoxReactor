@@ -5,7 +5,7 @@ using static MeshVR.PresetManager;
 
 namespace PPirate.VoxReactor
 {
-    internal class StimulationManager: SafeMvr
+    internal class StimulationManager : SafeMvr
     {
         private readonly VoxtaCharacter character;
         private readonly Logger logger;

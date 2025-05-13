@@ -76,6 +76,7 @@ namespace PPirate.VoxReactor
                 sexManager = new SexManager(this);
                 AddChild(sexManager);
                 dirtyTalkManager = new DirtyTalkManager(this);
+                AddChild(dirtyTalkManager);
                 shakeManager = new ShakeManager(this);
                 blowjobManager = new BlowJobManager(this);
                 clothingManager = new ClothingManager(this);

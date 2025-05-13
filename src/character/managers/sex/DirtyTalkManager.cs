@@ -5,22 +5,23 @@ using System.Collections.Generic;
 using SimpleJSON;
 using UnityEngine.UI;
 using LeapInternal;
+using System.Linq;
 
 namespace PPirate.VoxReactor
 {
-    internal class DirtyTalkManager
+    internal class DirtyTalkManager : SafeMvr
     {
         private Logger logger;
 
         VoxtaCharacter character;
-        /*
-        private readonly float minDirtyTalkDelay = 5f;
-        private readonly float maxDirtyTalkDelay = 5f;
-        private readonly float dirtyTalkChance = 100f;
-         */
-         private readonly float minDirtyTalkDelay = 16.0f;
+
+        private readonly float minDirtyTalkDelay = 16.0f;
         private readonly float maxDirtyTalkDelay = 25.0f;
-        private readonly float dirtyTalkChance = 70f;
+        private readonly float dirtyTalkChance = 80f;
+
+        //private readonly float minDirtyTalkDelay = 5.0f;
+        //private readonly float maxDirtyTalkDelay = 5.0f;
+        //private readonly float dirtyTalkChance = 100f;
 
         public JSONStorableAction OnDirtyTalk;
         JSONStorableString dirtyTalkConfig;
@@ -29,65 +30,107 @@ namespace PPirate.VoxReactor
 
             this.character = character;
 
+            
+
+            JSONStorableString globalLines = ConfigVoxReactor.singeton.globalDirtyTalkConfig.dirtyTalkLines;
+
+            AddCallback(globalLines, (string lines) =>
+            {
+                OnGlobalDirtyTalkLinesChange(lines);
+            });
+            OnGlobalDirtyTalkLinesChange(globalLines.val);
+
+
+
+
             OnDirtyTalk = new JSONStorableAction("OnDirtyTalk", DirtyTalkHelper);
             character.main.RegisterAction(OnDirtyTalk);
-           // var labelField = character.main.CreateTextField(new JSONStorableString("DirtyTalkConfigLabel", "Dirty talk config. Seperate concepts to talk dirty about with commas."), true);
-
-           // dirtyTalkConfig = new JSONStorableString("DirtyTalkConfig", "");
-            //CreateTextInput(dirtyTalkConfig, true);
         }
+        public void OnGlobalDirtyTalkLinesChange(string lines) {
 
-        private static List<String> globalDirtyTalkLines = new List<String> 
+            DirtyTalkManager.globalDirtyTalkLines = ParseDirtyTalkLines(lines);
+        }
+        public static List<string> ParseDirtyTalkLines(string lines)
         {
-            
-            "{{ char }}'s next reply SHALL be talking dirty about the situation.",
-            "{{ char }}'s next reply SHALL be asking if he likes her sexually servicing him.",
-            "{{ char }}'s next reply SHALL be dirty talk about how she is his slut.",
-            "{{ char }}'s next reply SHALL pervy dirty talk about wanting to be used.",
-            "{{ char }}'s next reply SHALL be dirty talk about how wet she is.",
-            
-           
-        };
-        private List<String> currentDirtyTalkLInes = globalDirtyTalkLines;
+
+            return lines
+                .Split(',')
+                .Select(s => lineBase + s.Trim())
+                .ToList();
+        }
+        public static List<String> globalDirtyTalkLines;
+        private static string lineBase = "{{ char }}'s next reply SHALL be ";
+
+
+        private List<String> currentDirtyTalkLInes = new List<string>();
         private bool shouldDirtyTalk = false;
         public void StartDirtyTalk(List<String> lines) {
             shouldDirtyTalk = true;
-            currentDirtyTalkLInes = new List<string>();
-            foreach (String line in globalDirtyTalkLines)
-            {
-               // currentDirtyTalkLInes.Add(line);
-            }
-            foreach (String line in lines)
-            {
-                currentDirtyTalkLInes.Add(line);
-            }
+            currentDirtyTalkLInes = lines;
             logger.DEBUG("Starting Dirty talk");
             character.main.RunCoroutine(DirtyTalkEnumerator());
         }
         public void StopDirtyTalk() {
             shouldDirtyTalk = false;
+            currentDirtyTalkLInes.Clear();
         }
         IEnumerator DirtyTalkEnumerator()
         {
+            logger.DEBUG("Waiting!!!");
             yield return new WaitForSeconds(UnityEngine.Random.Range(minDirtyTalkDelay, maxDirtyTalkDelay));
-            if(shouldDirtyTalk)
+            logger.DEBUG("Done waiting !!!");
+
+            if (shouldDirtyTalk)
                 DirtyTalk();
         }
         System.Random random = new System.Random();
         private void DirtyTalk() {
-            if (UnityEngine.Random.Range(0, 100) <= dirtyTalkChance)
+            var randomNumber = UnityEngine.Random.Range(0, 100);
+            logger.StartMethod("DirtyTalk Random: " + randomNumber);
+            logger.StartMethod("dirtyTalkChance: " + dirtyTalkChance);
+            logger.StartMethod("compare: " + (randomNumber <= dirtyTalkChance));
+            if (randomNumber > dirtyTalkChance)
             {
+                logger.StartMethod("chance failed");
                 return;
             }
             DirtyTalkHelper();
             character.main.RunCoroutine(DirtyTalkEnumerator());
         }
         private void DirtyTalkHelper() {
-            int randomIndex = random.Next(currentDirtyTalkLInes.Count);
-            string randomItem = currentDirtyTalkLInes[randomIndex];
-            //character.voxtaService.SendEventNow(randomItem);
-            character.voxtaService.SendSecret(randomItem);
-            character.voxtaService.SendEventNow(" ");
+            logger.StartMethod("DirtyTalkHelper()");
+
+            try
+            {
+                if (!DirtyTalkEnabled())
+                {
+                    logger.DEBUG("dirty talk disabled");
+                    return;
+                }
+                bool shouldAddGlobal = currentDirtyTalkLInes.Count == 0;
+                if (shouldAddGlobal)
+                {
+                    logger.DEBUG("no current lines, adding global");
+                    currentDirtyTalkLInes = AtomUtils.ConcatList(new List<string>(), globalDirtyTalkLines); //todo
+                }
+                logger.DEBUG("Count is +"+ currentDirtyTalkLInes.Count);
+                int randomIndex = random.Next(currentDirtyTalkLInes.Count);
+                logger.DEBUG("Random is is +" + randomIndex);
+
+                string randomItem = currentDirtyTalkLInes[randomIndex];
+                //character.voxtaService.SendEventNow(randomItem);
+                character.voxtaService.SendSecret(randomItem);
+                character.voxtaService.SendEventNow(" ");
+
+                if (shouldAddGlobal)
+                {
+                    currentDirtyTalkLInes.Clear();
+                }
+            }
+            catch (Exception e) {
+                logger.ERR(e.Message);
+            }
+            
             
         }
         
@@ -103,5 +146,8 @@ namespace PPirate.VoxReactor
             return textfield;
         }
 
+        private bool DirtyTalkEnabled() {
+            return ConfigVoxReactor.singeton.globalDirtyTalkConfig.dirtyTalkEnabled.val;
+        }
     }
 }

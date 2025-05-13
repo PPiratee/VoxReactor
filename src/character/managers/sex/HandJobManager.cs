@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using SimpleJSON;
 using LeapInternal;
+using System.Linq;
 
 namespace PPirate.VoxReactor
 {
@@ -13,6 +14,7 @@ namespace PPirate.VoxReactor
 
         VoxtaCharacter character;
         SilverHandJobPlugin hjPlugin;
+        ConfigHandJob globalHandjobConfig;
 
 
         private readonly String VOX_ACTION_HANDJOB = "handjob";
@@ -21,15 +23,6 @@ namespace PPirate.VoxReactor
         private readonly String VOX_ACTION_SLOWER = "slower";
         private readonly String VOX_ACTION_TIP = "tip";
         private readonly String VOX_ACTION_SHAFT = "shaft";
-
-        private List<String> dirtyTalkLines = new List<String>
-        {
-            "{{ char }}'s next reply SHALL be about how she wants him to cum on her tits.",
-            "{{ char }}'s next reply SHALL be about how she wants him to cum on her face.",
-            "{{ char }}'s next reply SHALL be about how hard {{ user }} is.",
-            "{{ char }}'s next reply SHALL be about how {{ user }}'s cock feels in her hand.",
-            "{{ char }}'s next reply SHALL be asking if he likes her giving him a hand job",
-        };
 
 
         public HandJobManager(VoxtaCharacter character) {
@@ -44,6 +37,8 @@ namespace PPirate.VoxReactor
             character.actionObserverRegistry.RegisterObserver(VOX_ACTION_SLOWER, Slower);
             character.actionObserverRegistry.RegisterObserver(VOX_ACTION_TIP, Tip);
             character.actionObserverRegistry.RegisterObserver(VOX_ACTION_SHAFT, Shaft);
+
+            this.globalHandjobConfig = ConfigVoxReactor.singeton.globalHandJobConfig;
         }
 
         string contextItem = null;
@@ -59,7 +54,20 @@ namespace PPirate.VoxReactor
             hjPlugin.SetIsActive(true);
             //play hj anim
             //character.plugins.bodyTimeline.PlayArmsDownHj();
-            character.dirtyTalkManager.StartDirtyTalk(dirtyTalkLines);
+            character.dirtyTalkManager.StartDirtyTalk(GetDirtyTalkLines());
+        }
+        public List<string> GetDirtyTalkLines() {
+            //todo overriding/extending logic n shit
+            //currently just extending
+
+            var rv = AtomUtils.ConcatList( new List<string>(),
+                    DirtyTalkManager.ParseDirtyTalkLines(globalHandjobConfig.dirtyTalkConfig.dirtyTalkLines.val)
+              );
+            rv = AtomUtils.ConcatList(rv, DirtyTalkManager.globalDirtyTalkLines);
+
+
+
+            return rv;
         }
         private void ActionHandjobStop()
         {

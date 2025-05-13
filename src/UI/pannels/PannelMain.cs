@@ -23,8 +23,9 @@ namespace PPirate.VoxReactor
             this.characterPannel = new PannelCharacters(this);
             subPannels = new List<UIPannel>
             {
-                new PannelMainSettings(this),
-                this.characterPannel
+                new PannelGlobalSettings(this),
+                this.characterPannel,
+               // new PannelDirtyTalkGlobal(this, ConfigVoxReactor.singeton.globalDirtyTalkConfig)
             };
         }
         public override void DrawPannelUI() {

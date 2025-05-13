@@ -44,5 +44,13 @@ namespace PPirate.VoxReactor
             // Call the provided action
             actionToCall();
         }
+
+        public static List<string> ConcatList(List<string> list, List<string>  other) {
+            foreach (var item in other)
+            {
+                list.Add(item);
+            }
+            return list;
+        }
     }
 }

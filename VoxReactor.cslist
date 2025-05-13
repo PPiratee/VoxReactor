@@ -50,9 +50,12 @@ src\UI\UIManager.cs
 src\UI\tabs\UITabBar.cs
 src\UI\tabs\UIPannel.cs
 src\UI\pannels\PannelMain.cs
-src\UI\pannels\PannelMainSettings.cs
+src\UI\pannels\PannelGlobalSettings.cs
 src\UI\pannels\SubSubMenu.cs
 src\UI\pannels\PannelCharacters.cs
+src\UI\pannels\PannelDirtyTalk.cs
+src\UI\pannels\PannelDirtyTalkGlobal.cs
+src\UI\pannels\PannelHandJobSettings.cs
 src\UI\pannels\character\PannelCharacter.cs
 src\UI\pannels\character\PannelCharacterClothingSettings.cs
 src\UI\pannels\character\PannelCharacterEmotionSettings.cs
@@ -60,6 +63,8 @@ src\UI\pannels\character\PannelCharacterSpecificEmotionSettings.cs
 src\UI\pannels\character\PannelCharacterBlushSettings.cs
 src\config\ConfigVoxReactor.cs
 src\config\ConfigInstanceStorable.cs
+src\config\ConfigDirtyTalk.cs
+src\config\ConfigHandJob.cs
 src\config\character\ConfigCharacterBase.cs
 src\config\character\ConfigCharacterClothing.cs
 src\config\character\ConfigCharacterEmotions.cs
