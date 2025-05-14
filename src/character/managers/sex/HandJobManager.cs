@@ -19,6 +19,8 @@ namespace PPirate.VoxReactor
 
         private readonly String VOX_ACTION_HANDJOB = "handjob";
         private readonly String VOX_ACTION_HANDJOB_STOP = "handjob_stop";
+        private readonly String VOX_ACTION_HANDJOB_ACCEPT = "handjob_accept";
+        
         private readonly String VOX_ACTION_FASTER = "faster";
         private readonly String VOX_ACTION_SLOWER = "slower";
         private readonly String VOX_ACTION_TIP = "tip";
@@ -32,6 +34,8 @@ namespace PPirate.VoxReactor
             hjPlugin = character.plugins.hjPlugin;
 
             character.actionObserverRegistry.RegisterObserver(VOX_ACTION_HANDJOB, ActionHandjob);
+            character.actionObserverRegistry.RegisterObserver(VOX_ACTION_HANDJOB_ACCEPT, ActionHandjob);
+
             character.actionObserverRegistry.RegisterObserver(VOX_ACTION_HANDJOB_STOP, ActionHandjobStop);
             character.actionObserverRegistry.RegisterObserver(VOX_ACTION_FASTER, Faster);
             character.actionObserverRegistry.RegisterObserver(VOX_ACTION_SLOWER, Slower);

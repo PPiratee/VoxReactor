@@ -16,6 +16,8 @@ namespace PPirate.VoxReactor
 
         private readonly String VOX_ACTION_BATT_EYES = "batt_eyes_char";
         private readonly String VOX_ACTION_WINK = "wink_char";
+        private readonly String VOX_ACTION_EYES_WIDEN = "eyes_widen_char";
+
 
         private readonly Logger logger;
 
@@ -28,7 +30,11 @@ namespace PPirate.VoxReactor
 
             character.actionObserverRegistry.RegisterObserver(VOX_ACTION_BATT_EYES + character.characterNumber, OnBattEyes);
             character.actionObserverRegistry.RegisterObserver(VOX_ACTION_WINK + character.characterNumber, Wink);
+
             character.stateManager.observerRegistry.RegisterObserver(StateManager.REGISTRY_STOP_SPEAKING, OnSpeakingStop);
+           
+            character.actionObserverRegistry.RegisterObserver(VOX_ACTION_EYES_WIDEN + character.characterNumber, OnEyesWiden);
+
 
         }
         public void OnLookAtTitsCallback()
@@ -59,7 +65,7 @@ namespace PPirate.VoxReactor
         float timeBetweenBatts = 0.26f;
 
         public void OnBattEyes() {
-            SuperController.LogError("BATTS EYES");
+            //SuperController.LogError("BATTS EYES");
             character.plugins.glancePlugin.SetBlinkEnabled(false);
             timesToBlink = UnityEngine.Random.Range(batMinBlink, batMaxBlink + 1);
             timesBlinked = 0;
@@ -72,10 +78,10 @@ namespace PPirate.VoxReactor
         }
         private void Blink() {
             timesBlinked++;
-            SuperController.LogError("timesToBlink" + timesToBlink);
+            //SuperController.LogError("timesToBlink" + timesToBlink);
 
 
-            SuperController.LogError("TimesBlinked" + timesBlinked);
+            //SuperController.LogError("TimesBlinked" + timesBlinked);
 
             character.plugins.glancePlugin.BlinkNow();
             if (timesBlinked == timesToBlink) { 
@@ -83,26 +89,32 @@ namespace PPirate.VoxReactor
 
             }
         }
-        private bool pendingWink = false;
+    
         private void Wink()
         {
+            //SuperController.LogError("Wink!");
             logger.StartMethod("Wink()");
-            pendingWink = true;
+            AtomUtils.RunAfterDelay(1f, () => {
+                character.plugins.glancePlugin.SetBlinkEnabled(false);
+                character.plugins.headTimeLine.PlayWink();
+                AtomUtils.RunAfterDelay(1f, () => {
+                    character.plugins.glancePlugin.SetBlinkEnabled(true);
+                });
+            });
+            
         }
 
         private void OnSpeakingStop()
         {
             logger.StartMethod("OnSpeakingStop()");
             
-            if (pendingWink)
-            {
-                pendingWink = false;
-                character.plugins.glancePlugin.SetBlinkEnabled(false);
-                character.plugins.headTimeLine.PlayWink();
-                AtomUtils.RunAfterDelay(1f, () => {
-                    character.plugins.glancePlugin.SetBlinkEnabled(true);
-                });
-            }
+
+        }
+        private void OnEyesWiden()
+        {
+            //SuperController.LogError("EYES WIDEN!");
+
+            character.plugins.headTimeLine.PlayEyesWiden();
         }
     }
 }

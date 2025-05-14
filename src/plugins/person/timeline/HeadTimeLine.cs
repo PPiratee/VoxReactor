@@ -32,6 +32,10 @@ namespace PPirate.VoxReactor
             timelinePlugin.CallAction("Play wink");
         }
 
+        public void PlayEyesWiden() { 
+            timelinePlugin.CallAction("Play eyesWide");
+        }
+
 
     }
 }

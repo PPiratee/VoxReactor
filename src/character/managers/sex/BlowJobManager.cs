@@ -15,6 +15,8 @@ namespace PPirate.VoxReactor
         private SilverBlowJobPlugin bjPlugin;
 
         private readonly String VOX_ACTION_BLOWJOB = "blowjob";
+        private readonly String VOX_ACTION_BLOWJOB_ACCEPT = "blowjob_accept";
+
         private readonly String VOX_ACTION_BLOWJOB_STOP = "blowjob_stop";
 
         private readonly float minBlowJBreakDelay = 6.0f;
@@ -25,6 +27,8 @@ namespace PPirate.VoxReactor
         private readonly float maxBlowJResumeDelay = 5.0f;
 
         private bool isGivingBj = false;
+        private bool isPausingBj = false;
+
         public BlowJobManager(VoxtaCharacter character) {
             logger = new Logger("BlowJobManager:Char#" + character.characterNumber);
 
@@ -33,7 +37,13 @@ namespace PPirate.VoxReactor
             bjPlugin = character.plugins.bjPlugin;
 
             character.actionObserverRegistry.RegisterObserver(VOX_ACTION_BLOWJOB, BlowJobStart);
+            character.actionObserverRegistry.RegisterObserver(VOX_ACTION_BLOWJOB_ACCEPT, BlowJobStart);
+
+            
+
             character.actionObserverRegistry.RegisterObserver(VOX_ACTION_BLOWJOB_STOP, BlowJobStop);
+            character.stateManager.observerRegistry.RegisterObserver(StateManager.REGISTRY_START_SPEAKING, OnStartTalking);
+            character.stateManager.observerRegistry.RegisterObserver(StateManager.REGISTRY_STOP_SPEAKING, OnsStopTalking);
         }
 
         String bjContextItem = null;
@@ -43,9 +53,8 @@ namespace PPirate.VoxReactor
             StateManager stateManager = character.stateManager;
             if (stateManager.StateIsSpeaking())
             {
+                isPausingBj = true;
                 logger.DEBUG("Char is speaking, waiting for stop speaking to start bj ");
-                stateManager.observerRegistry.RegisterObserver(StateManager.REGISTRY_STOP_SPEAKING, BlowJobStartHelper);
-
             }
             else {
                 DoBj();
@@ -53,48 +62,66 @@ namespace PPirate.VoxReactor
             
 
         }
-        private void BlowJobStartHelper() { 
-            if (isGivingBj) {
+        private void OnsStopTalking() { 
+            if (isPausingBj) {
                 logger.DEBUG("Done speaking, doing BJ now ");
                 DoBj();
             }
         }
+
+        private void OnStartTalking() {
+            if (isGivingBj)
+            {
+                isGivingBj = false;
+                isPausingBj = true;
+                logger.DEBUG("OnStartTalking, while giving bj, pause bj until char stops speaking ");
+                bjPlugin.SetIsActive(false);
+                character.gazeManager.SetEnabled(true);
+                character.voxtaService.voxtaContextService.RemoveContextItem(bjContextItem);
+                bjContextItem = $"{character.name} is taking a break from giving {character.voxtaService.userName} a blowjob.";
+                character.voxtaService.voxtaContextService.AddContextItem(bjContextItem);
+            }
+        }
+
         private void DoBj() {
-            character.main.RunCoroutine(BlowjobBreakEnumerator());
-            character.voiceManager.SetCharacterCanSpeak(false);
+            AtomUtils.RunAfterDelay(UnityEngine.Random.Range(minBlowJBreakDelay, maxBlowJBreakDelay), () => {
+                BlowjobBreak();
+            });
+            isPausingBj = false;
+            isGivingBj = true;
+   
+
             bjContextItem = $"{character.name} is giving {character.voxtaService.userName} a blowjob";
             character.voxtaService.voxtaContextService.AddContextItem(bjContextItem);
             character.voxtaService.SendSecret($"{character.name} started giving {character.voxtaService.userName} a blowjob");
             bjPlugin.SetIsActive(true);
             character.gazeManager.SetEnabled(false);
-
         }
+
         private void BlowJobStop() {
             logger.DEBUG("Stopping BJ");
             isGivingBj = false;
-            character.voiceManager.SetCharacterCanSpeak(true);
+            isPausingBj = false;
+            //character.voiceManager.SetCharacterCanSpeak(true);
             bjPlugin.SetIsActive(false);
             character.gazeManager.SetEnabled(true);
             character.voxtaService.voxtaContextService.RemoveContextItem(bjContextItem);
 
         }
 
-        IEnumerator BlowjobBreakEnumerator()
-        {
-            yield return new WaitForSeconds(UnityEngine.Random.Range(minBlowJBreakDelay, maxBlowJBreakDelay));
-            BlowjobBreak();
-
-        }
+ 
 
         private void BlowjobBreak() {
-            if (!isGivingBj) {
+            if (!isGivingBj || isPausingBj) {
                 return;
             }
             if (!(UnityEngine.Random.Range(0, 100) <= blowJBreakChance))
             {
                 return;
             }
-            character.voiceManager.SetCharacterCanSpeak(true);
+            //character.voiceManager.SetCharacterCanSpeak(true);
+            isPausingBj = true;
+            isGivingBj = false;
             bjPlugin.SetIsActive(false);
             character.gazeManager.SetEnabled(true);
             character.voxtaService.voxtaContextService.RemoveContextItem(bjContextItem);
@@ -103,30 +130,29 @@ namespace PPirate.VoxReactor
            
             character.voxtaService.SendSecret($"{character.name} pauses giving {character.voxtaService.userName} a blowjob and looks up at him. ");
             character.voxtaService.SendEventNow(" ");
-            character.main.RunCoroutine(BlowJobResumeEnumerator());
 
-        }
-
-        IEnumerator BlowJobResumeEnumerator()
-        {
-            yield return new WaitForSeconds(1);
-            if (isGivingBj)
-            {
-                if (character.stateManager.StateIsIdle())
+            AtomUtils.RunAfterDelay(1, () => {
+                if (isGivingBj)
                 {
-                    BlowJobResume();
+                    if (character.stateManager.StateIsIdle())
+                    {
+                        BlowJobResume();
+                    }
+                    else
+                    {
+                        isPausingBj = true;
+                    }
+
                 }
-                else { 
-                    character.main.RunCoroutine(BlowJobResumeEnumerator());
-                }
-               
-            }
+            });
+
         }
+
+
         private void BlowJobResume() {
             isGivingBj = true;
+            isPausingBj = false;
 
-            character.main.RunCoroutine(BlowjobBreakEnumerator());
-            character.voiceManager.SetCharacterCanSpeak(false);
             bjPlugin.SetIsActive(true);
             character.gazeManager.SetEnabled(false);
             character.voxtaService.SendSecret($"{character.name} resumed giving {character.voxtaService.userName} a blowjob");
