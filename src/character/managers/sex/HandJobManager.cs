@@ -28,14 +28,15 @@ namespace PPirate.VoxReactor
         }
 
         string contextItem = null;
+        bool tipFocus = false;
         public void ActionHandjob(bool shouldDirtyTalk)
         {
             logger.StartMethod("ActionHandjob()");
-            string newContextItem = $"{character.name} is giving {character.voxtaService.userName} a hand job.";
-            contextItem = newContextItem;
-            character.voxtaService.voxtaContextService.AddContextItem(newContextItem);
-
             currentSpeed = SPEED_MEDIUM;
+            tipFocus = false;
+
+            SetContextItem();
+
             UpdateSpeed();
             hjPlugin.SetIsActive(true);
             isGivingHj = true;
@@ -80,12 +81,15 @@ namespace PPirate.VoxReactor
 
         public void ActionTip() {
             TipAdjust(1f);
+            tipFocus = true;
+            SetContextItem();
         }
 
         public void ActionShaft()
         {
             TipAdjust(0f);
-
+            tipFocus = false;
+            SetContextItem();
         }
 
         private void TipAdjust(float chance) { 
@@ -119,6 +123,49 @@ namespace PPirate.VoxReactor
             }
             UpdateSpeed();
         }
+        private void SetContextItem() {
+            string newContextItem = "";
+            if (currentSpeed == SPEED_SLOW)
+            {
+                if (tipFocus)
+                {
+                    newContextItem = $"{character.name} is slowly stroking the tip of {character.voxtaService.userName}'s cock";
+                }
+                else { 
+                    newContextItem = $"{character.name} is slowly stroking {character.voxtaService.userName}'s cock";
+                }
+            }
+            else if (currentSpeed == SPEED_MEDIUM)
+            {
+                if (tipFocus)
+                {
+                    newContextItem = $"{character.name} is stroking the tip of {character.voxtaService.userName}'s cock at a medium pace";
+                }
+                else
+                {
+                    newContextItem = $"{character.name} is stroking {character.voxtaService.userName}'s cock at a medium pace";
+                }
+                
+            }
+            else 
+            {
+                if (tipFocus)
+                {
+                    newContextItem = $"{character.name} is vigorusly stroking the tip of {character.voxtaService.userName}'s cock";
+                }
+                else
+                {
+                    newContextItem = $"{character.name} is vigorusly stroking {character.voxtaService.userName}'s cock";
+                }
+                
+            }
+
+
+            if (contextItem != null)
+                character.voxtaService.voxtaContextService.RemoveContextItem(contextItem);
+            character.voxtaService.voxtaContextService.AddContextItem(newContextItem);
+            contextItem = newContextItem;
+        }
 
         private string currentSpeed = "medium";
         private readonly string SPEED_SLOW = "slow";
@@ -141,6 +188,7 @@ namespace PPirate.VoxReactor
             hjPlugin.SetSpeedMin(curretSpeedData.min);
             hjPlugin.SetSpeedMax(curretSpeedData.max);
             hjPlugin.SetOverallSpeed(curretSpeedData.overall);
+            SetContextItem();
         }
     }
 
