@@ -64,15 +64,23 @@ namespace PPirate.VoxReactor
 
         private List<String> currentDirtyTalkLInes = new List<string>();
         private bool shouldDirtyTalk = false;
+
+        IEnumerator currentDirtyTalkEnumerator;
         public void StartDirtyTalk(List<String> lines) {
             shouldDirtyTalk = true;
             currentDirtyTalkLInes = lines;
             logger.DEBUG("Starting Dirty talk");
-            character.main.RunCoroutine(DirtyTalkEnumerator());
+
+            currentDirtyTalkEnumerator = DirtyTalkEnumerator();
+            character.main.RunCoroutine(currentDirtyTalkEnumerator);
         }
         public void StopDirtyTalk() {
             shouldDirtyTalk = false;
             currentDirtyTalkLInes.Clear();
+            if (currentDirtyTalkEnumerator != null) { 
+                character.main.StopCoroutine(currentDirtyTalkEnumerator);
+                currentDirtyTalkEnumerator = null;
+            }
         }
         IEnumerator DirtyTalkEnumerator()
         {

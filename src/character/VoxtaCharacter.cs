@@ -9,8 +9,6 @@ namespace PPirate.VoxReactor
 {
     internal class VoxtaCharacter : SafeMvr
     {
-
-
         public readonly Main main;
         public readonly Atom atom;
         public readonly string name;
@@ -33,7 +31,6 @@ namespace PPirate.VoxReactor
         public readonly SexManager sexManager;
         public readonly DirtyTalkManager dirtyTalkManager;
         public readonly ShakeManager shakeManager;
-        public readonly BlowJobManager blowjobManager;
         public readonly ClothingManager clothingManager;
         public readonly ExpressionManager expressionManager;
 
@@ -78,7 +75,7 @@ namespace PPirate.VoxReactor
                 dirtyTalkManager = new DirtyTalkManager(this);
                 AddChild(dirtyTalkManager);
                 shakeManager = new ShakeManager(this);
-                blowjobManager = new BlowJobManager(this);
+                
                 clothingManager = new ClothingManager(this);
 
                 eventShowTits = new EventShowTits(this);

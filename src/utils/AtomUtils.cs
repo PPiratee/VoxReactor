@@ -31,9 +31,11 @@ namespace PPirate.VoxReactor
         //todo move to a different util
        
 
-        public static void RunAfterDelay(float delay, Action actionToCall)
+        public static IEnumerator RunAfterDelay(float delay, Action actionToCall)
         {
-            Main.singleton.RunCoroutine(RunAfterDelayEnumerator(delay, actionToCall));
+            var enumerator = RunAfterDelayEnumerator(delay, actionToCall);
+            Main.singleton.RunCoroutine(enumerator);
+            return enumerator;
         }
 
         private static IEnumerator RunAfterDelayEnumerator(float delay, Action actionToCall)

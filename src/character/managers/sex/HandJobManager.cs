@@ -16,37 +16,19 @@ namespace PPirate.VoxReactor
         SilverHandJobPlugin hjPlugin;
         ConfigHandJob globalHandjobConfig;
 
-
-        private readonly String VOX_ACTION_HANDJOB = "handjob";
-        private readonly String VOX_ACTION_HANDJOB_STOP = "handjob_stop";
-        private readonly String VOX_ACTION_HANDJOB_ACCEPT = "handjob_accept";
-        
-        private readonly String VOX_ACTION_FASTER = "faster";
-        private readonly String VOX_ACTION_SLOWER = "slower";
-        private readonly String VOX_ACTION_TIP = "tip";
-        private readonly String VOX_ACTION_SHAFT = "shaft";
-
-
+        public bool isGivingHj = false;
         public HandJobManager(VoxtaCharacter character) {
             logger = new Logger("HandJobManager:Char#" + character.characterNumber);
             logger.Constructor();
             this.character = character;
             hjPlugin = character.plugins.hjPlugin;
 
-            character.actionObserverRegistry.RegisterObserver(VOX_ACTION_HANDJOB, ActionHandjob);
-            character.actionObserverRegistry.RegisterObserver(VOX_ACTION_HANDJOB_ACCEPT, ActionHandjob);
-
-            character.actionObserverRegistry.RegisterObserver(VOX_ACTION_HANDJOB_STOP, ActionHandjobStop);
-            character.actionObserverRegistry.RegisterObserver(VOX_ACTION_FASTER, Faster);
-            character.actionObserverRegistry.RegisterObserver(VOX_ACTION_SLOWER, Slower);
-            character.actionObserverRegistry.RegisterObserver(VOX_ACTION_TIP, Tip);
-            character.actionObserverRegistry.RegisterObserver(VOX_ACTION_SHAFT, Shaft);
-
+            
             this.globalHandjobConfig = ConfigVoxReactor.singeton.globalHandJobConfig;
         }
 
         string contextItem = null;
-        private void ActionHandjob()
+        public void ActionHandjob(bool shouldDirtyTalk)
         {
             logger.StartMethod("ActionHandjob()");
             string newContextItem = $"{character.name} is giving {character.voxtaService.userName} a hand job.";
@@ -56,10 +38,25 @@ namespace PPirate.VoxReactor
             currentSpeed = SPEED_MEDIUM;
             UpdateSpeed();
             hjPlugin.SetIsActive(true);
+            isGivingHj = true;
             //play hj anim
             //character.plugins.bodyTimeline.PlayArmsDownHj();
-            character.dirtyTalkManager.StartDirtyTalk(GetDirtyTalkLines());
+
+            if (shouldDirtyTalk)
+                character.dirtyTalkManager.StartDirtyTalk(GetDirtyTalkLines());
         }
+
+        public void ActionBlowjobStart() {
+            if(isGivingHj)
+                character.dirtyTalkManager.StopDirtyTalk();
+        }
+
+        public void ActionBlowjobStop()
+        {
+            if (isGivingHj)
+                character.dirtyTalkManager.StartDirtyTalk(GetDirtyTalkLines());
+        }
+
         public List<string> GetDirtyTalkLines() {
             //todo overriding/extending logic n shit
             //currently just extending
@@ -73,25 +70,29 @@ namespace PPirate.VoxReactor
 
             return rv;
         }
-        private void ActionHandjobStop()
+        public void ActionHandjobStop()
         {
+            isGivingHj = false;
             hjPlugin.SetIsActive(false);
             character.voxtaService.voxtaContextService.RemoveContextItem(contextItem);
             character.dirtyTalkManager.StopDirtyTalk();
-
         }
-        private void Tip() {
+
+        public void ActionTip() {
             TipAdjust(1f);
         }
-        private void Shaft()
+
+        public void ActionShaft()
         {
             TipAdjust(0f);
 
         }
+
         private void TipAdjust(float chance) { 
             hjPlugin.SetTopOnlyChance(chance);
         }
-        private void Faster() {
+
+        public void ActionFaster() {
             if (currentSpeed == SPEED_FAST) {
                 return;
             } else if (currentSpeed == SPEED_SLOW) {
@@ -102,7 +103,8 @@ namespace PPirate.VoxReactor
             }
             UpdateSpeed();
         }
-        private void Slower() {
+
+        public void ActionSlower() {
             if (currentSpeed == SPEED_SLOW)
             {
                 return;
@@ -117,6 +119,7 @@ namespace PPirate.VoxReactor
             }
             UpdateSpeed();
         }
+
         private string currentSpeed = "medium";
         private readonly string SPEED_SLOW = "slow";
         private readonly string SPEED_MEDIUM = "medium";
@@ -125,7 +128,6 @@ namespace PPirate.VoxReactor
         private readonly HjSpeed HJ_SPEEDS_SLOW = new HjSpeed(0.36f, 3.0f, 0.21f);
         private readonly HjSpeed HJ_SPEEDS_MEDIUM = new HjSpeed(1.05f, 4.8f, 0.88f);
         private readonly HjSpeed HJ_SPEEDS_FAST = new HjSpeed(1.7f, 6.3f, 1.50f);
-
 
 
         private void UpdateSpeed() {
@@ -141,6 +143,7 @@ namespace PPirate.VoxReactor
             hjPlugin.SetOverallSpeed(curretSpeedData.overall);
         }
     }
+
     internal class HjSpeed {
         public readonly float min;
         public readonly float max;
