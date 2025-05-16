@@ -94,7 +94,7 @@ namespace PPirate.VoxReactor
             }
 
             currentlyTouching.Add(part);
-            character.voxtaService.RequestCharacterSpeech(GetRandomItem(voiceLinesTouchPos));
+            //character.voxtaService.RequestCharacterSpeech(GetRandomItem(voiceLinesTouchPos));todo make optional
 
             if (!TouchReactionEvent(part))
                 character.voxtaService.SendSecret($"{character.voxtaService.userName} started touching {character.name}'s: " + part);

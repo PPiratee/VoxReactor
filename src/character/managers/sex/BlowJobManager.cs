@@ -42,8 +42,6 @@ namespace PPirate.VoxReactor
         String bjContextItem = null;
         bool startingSecretSent;
         public void ActionBlowJobStart() {//todo
-            SuperController.LogError("BBBBBBBBBBBBJJJJJJJJ");
-            logger.StartMethod("BlowJobStart()");
             isPausingBj = true; // this action is called before a state change, so the bj will start then pause for the reply to the blowjob accept
             startingSecretSent = false;
 

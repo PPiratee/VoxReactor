@@ -79,6 +79,7 @@ namespace PPirate.VoxReactor
             StartEnumerator();
         }
         public void StartEnumerator() {
+            StopEnumerator();
             currentDirtyTalkEnumerator = DirtyTalkEnumerator();
             character.main.RunCoroutine(currentDirtyTalkEnumerator);
         }
@@ -128,7 +129,7 @@ namespace PPirate.VoxReactor
                 return;
             }
             DirtyTalkHelper();
-            character.main.RunCoroutine(DirtyTalkEnumerator());
+            StartEnumerator();
         }
         private void DirtyTalkHelper() {
             logger.StartMethod("DirtyTalkHelper()");
