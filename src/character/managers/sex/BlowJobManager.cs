@@ -42,20 +42,15 @@ namespace PPirate.VoxReactor
         String bjContextItem = null;
         bool startingSecretSent;
         public void ActionBlowJobStart() {//todo
+            SuperController.LogError("BBBBBBBBBBBBJJJJJJJJ");
             logger.StartMethod("BlowJobStart()");
             isPausingBj = true; // this action is called before a state change, so the bj will start then pause for the reply to the blowjob accept
             startingSecretSent = false;
 
-            //isGivingBj = true;
-            //StateManager stateManager = character.stateManager;
-            //if (stateManager.StateIsIdle())
-            //{
-            //    isPausingBj = true;
-            //    logger.DEBUG("Char is speaking, waiting for stop speaking to start bj ");
-            //}
-            //else {
-            //    DoBj();
-            //}
+            resumeEnumerator = AtomUtils.RunAfterDelay(UnityEngine.Random.Range(2, 2), () => {
+                if(!character.stateManager.StateIsSpeaking())
+                    DoBj();
+            });
         }
 
         public void ActionBlowJobStop()
@@ -126,6 +121,7 @@ namespace PPirate.VoxReactor
         }
         private void OnCharacterStartTalking()
         {
+            StopResumeCoroutine();
             StopBreakCoroutine();
             if (isGivingBj && !isPausingBj)
             {
