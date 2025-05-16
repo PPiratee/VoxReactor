@@ -22,6 +22,8 @@ namespace PPirate.VoxReactor
 
         public readonly ObserverRegistry globalObserverRegistry;
         public static string REGISTRY_USER_SPEAKING = "userSpeaking";
+        public static string REGISTRY_USER_SPEAKING_STOP = "userSpeakingStop";
+
 
         public string userName;
 
@@ -97,17 +99,22 @@ namespace PPirate.VoxReactor
             //.actionObserverRegistry.InvokeObservers(action);
             characters[0].actionObserverRegistry.InvokeObservers(action);
         }
+        private string lastState = null;
         private void VoxtaStateConsumer(String state)
         {
             logger.DEBUG("Recieved state: " + state);
 
-            if (state == VoxtaPlugin.STATE_LISTENING) { 
+            if (state == VoxtaPlugin.STATE_LISTENING) {
                 globalObserverRegistry.InvokeObservers(REGISTRY_USER_SPEAKING);
+            } else if (lastState == VoxtaPlugin.STATE_LISTENING) {
+                globalObserverRegistry.InvokeObservers(REGISTRY_USER_SPEAKING_STOP);
+                
             }
-            // GetCharacterByName(voxtaPlugin.GetEnumFlagValue("currentName"))
-             //.stateManager.UpdateState(state);
-            characters[0].stateManager.UpdateState(state);
+                // GetCharacterByName(voxtaPlugin.GetEnumFlagValue("currentName"))
+                //.stateManager.UpdateState(state);
+                characters[0].stateManager.UpdateState(state);
 
+            lastState = state;
         }
         public void RequestCharacterSpeech(string speech) {
             

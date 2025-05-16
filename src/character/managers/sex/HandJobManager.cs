@@ -129,21 +129,21 @@ namespace PPirate.VoxReactor
             {
                 if (tipFocus)
                 {
-                    newContextItem = $"{character.name} is slowly stroking the tip of {character.voxtaService.userName}'s cock";
+                    newContextItem = $"{character.name} is slowly stroking the tip of {character.voxtaService.userName}'s cock.";
                 }
                 else { 
-                    newContextItem = $"{character.name} is slowly stroking {character.voxtaService.userName}'s cock";
+                    newContextItem = $"{character.name} is slowly stroking {character.voxtaService.userName}'s cock.";
                 }
             }
             else if (currentSpeed == SPEED_MEDIUM)
             {
                 if (tipFocus)
                 {
-                    newContextItem = $"{character.name} is stroking the tip of {character.voxtaService.userName}'s cock at a medium pace";
+                    newContextItem = $"{character.name} is stroking the tip of {character.voxtaService.userName}'s cock at a medium pace.";
                 }
                 else
                 {
-                    newContextItem = $"{character.name} is stroking {character.voxtaService.userName}'s cock at a medium pace";
+                    newContextItem = $"{character.name} is stroking {character.voxtaService.userName}'s cock at a medium pace.";
                 }
                 
             }
@@ -151,11 +151,11 @@ namespace PPirate.VoxReactor
             {
                 if (tipFocus)
                 {
-                    newContextItem = $"{character.name} is vigorusly stroking the tip of {character.voxtaService.userName}'s cock";
+                    newContextItem = $"{character.name} is vigorusly stroking the tip of {character.voxtaService.userName}'s cock.";
                 }
                 else
                 {
-                    newContextItem = $"{character.name} is vigorusly stroking {character.voxtaService.userName}'s cock";
+                    newContextItem = $"{character.name} is vigorusly stroking {character.voxtaService.userName}'s cock.";
                 }
                 
             }

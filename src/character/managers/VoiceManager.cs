@@ -32,8 +32,8 @@ namespace PPirate.VoxReactor
             headTimeLine = character.plugins.headTimeLine;
             gazeManager = character.gazeManager;
 
-            character.stateManager.observerRegistry.RegisterObserver(StateManager.REGISTRY_START_SPEAKING, OnSpeaking);
-            character.stateManager.observerRegistry.RegisterObserver(StateManager.REGISTRY_STOP_SPEAKING, OnSpeakingStop);
+            character.stateManager.observerRegistry.RegisterObserver(StateManager.REGISTRY_SPEAKING_START, OnSpeaking);
+            character.stateManager.observerRegistry.RegisterObserver(StateManager.REGISTRY_SPEAKING_STOP, OnSpeakingStop);
 
             //todo make this optional, and add a random chance. character.actionObserverRegistry.RegisterObserver(VOX_ACTION_GIGGLE + character.characterNumber, OnGiggle);
 

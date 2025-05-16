@@ -45,6 +45,11 @@ namespace PPirate.VoxReactor
 
             OnDirtyTalk = new JSONStorableAction("OnDirtyTalk", DirtyTalkHelper);
             character.main.RegisterAction(OnDirtyTalk);
+            character.stateManager.observerRegistry.RegisterObserver(StateManager.REGISTRY_SPEAKING_START, PauseDirtyTalk);
+            character.stateManager.observerRegistry.RegisterObserver(StateManager.REGISTRY_SPEAKING_STOP, ResumeDirtyTalk);
+            VoxtaService.singleton.globalObserverRegistry.RegisterObserver(VoxtaService.REGISTRY_USER_SPEAKING, PauseDirtyTalk);
+            VoxtaService.singleton.globalObserverRegistry.RegisterObserver(VoxtaService.REGISTRY_USER_SPEAKING_STOP, ResumeDirtyTalk);
+
         }
         public void OnGlobalDirtyTalkLinesChange(string lines) {
 
@@ -71,17 +76,37 @@ namespace PPirate.VoxReactor
             currentDirtyTalkLInes = lines;
             logger.DEBUG("Starting Dirty talk");
 
+            StartEnumerator();
+        }
+        public void StartEnumerator() {
             currentDirtyTalkEnumerator = DirtyTalkEnumerator();
             character.main.RunCoroutine(currentDirtyTalkEnumerator);
         }
         public void StopDirtyTalk() {
             shouldDirtyTalk = false;
             currentDirtyTalkLInes.Clear();
-            if (currentDirtyTalkEnumerator != null) { 
+            StopEnumerator();
+        }
+        public void StopEnumerator() {
+            if (currentDirtyTalkEnumerator != null)
+            {
                 character.main.StopCoroutine(currentDirtyTalkEnumerator);
                 currentDirtyTalkEnumerator = null;
             }
         }
+        bool isPausing = false;
+        public void PauseDirtyTalk()
+        {
+            isPausing = true;
+            StopEnumerator();
+
+        }
+        public void ResumeDirtyTalk() {
+            isPausing = false;
+            if (currentDirtyTalkEnumerator == null)
+                StartEnumerator();
+        }
+
         IEnumerator DirtyTalkEnumerator()
         {
             logger.DEBUG("Waiting!!!");

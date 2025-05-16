@@ -31,7 +31,7 @@ namespace PPirate.VoxReactor
             character.actionObserverRegistry.RegisterObserver(VOX_ACTION_BATT_EYES + character.characterNumber, OnBattEyes);
             character.actionObserverRegistry.RegisterObserver(VOX_ACTION_WINK + character.characterNumber, Wink);
 
-            character.stateManager.observerRegistry.RegisterObserver(StateManager.REGISTRY_STOP_SPEAKING, OnSpeakingStop);
+            character.stateManager.observerRegistry.RegisterObserver(StateManager.REGISTRY_SPEAKING_STOP, OnSpeakingStop);
            
             character.actionObserverRegistry.RegisterObserver(VOX_ACTION_EYES_WIDEN + character.characterNumber, OnEyesWiden);
 

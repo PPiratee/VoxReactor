@@ -33,9 +33,10 @@ namespace PPirate.VoxReactor
             bjPlugin = character.plugins.bjPlugin;
 
             
-            character.stateManager.observerRegistry.RegisterObserver(StateManager.REGISTRY_START_SPEAKING, OnStartTalking);
-            character.stateManager.observerRegistry.RegisterObserver(StateManager.REGISTRY_STOP_SPEAKING, OnsStopTalking);
+            character.stateManager.observerRegistry.RegisterObserver(StateManager.REGISTRY_SPEAKING_START, OnCharacterStartTalking);
+            character.stateManager.observerRegistry.RegisterObserver(StateManager.REGISTRY_SPEAKING_STOP, OnsStopTalking);
             VoxtaService.singleton.globalObserverRegistry.RegisterObserver(VoxtaService.REGISTRY_USER_SPEAKING, OnUserSpeaking);
+           
         }
 
         String bjContextItem = null;
@@ -83,15 +84,15 @@ namespace PPirate.VoxReactor
             isGivingBj = true;
             if(bjContextItem != null)
                 character.voxtaService.voxtaContextService.RemoveContextItem(bjContextItem);
-            bjContextItem = $"{character.name} is giving {character.voxtaService.userName} a blowjob";
+            bjContextItem = $"{character.name} is giving {character.voxtaService.userName} a blowjob.";
             character.voxtaService.voxtaContextService.AddContextItem(bjContextItem);
             if (!startingSecretSent)
             {
-                character.voxtaService.SendSecret($"{character.name} started giving {character.voxtaService.userName} a blowjob");
+                character.voxtaService.SendSecret($"{character.name} started giving {character.voxtaService.userName} a blowjob.");
                 startingSecretSent = true;
             }
             else {
-                character.voxtaService.SendSecret($"{character.name} resumed giving {character.voxtaService.userName} a blowjob");
+                character.voxtaService.SendSecret($"{character.name} resumed giving {character.voxtaService.userName} a blowjob.");
             }
                 bjPlugin.SetIsActive(true);
             character.gazeManager.SetEnabled(false);
@@ -118,12 +119,12 @@ namespace PPirate.VoxReactor
             character.gazeManager.SetEnabled(true);
 
             character.voxtaService.voxtaContextService.RemoveContextItem(bjContextItem);
-            bjContextItem = $"{character.name} is pausing giving {character.voxtaService.userName} a blowjob to talk dirty";
+            bjContextItem = $"{character.name} is pausing giving {character.voxtaService.userName} a blowjob to talk dirty.";
             character.voxtaService.voxtaContextService.AddContextItem(bjContextItem);
            
             character.voxtaService.SendSecret($"{character.name} pauses giving {character.voxtaService.userName} a blowjob and looks up at him. ");
         }
-        private void OnStartTalking()
+        private void OnCharacterStartTalking()
         {
             StopBreakCoroutine();
             if (isGivingBj && !isPausingBj)

@@ -16,8 +16,8 @@ namespace PPirate.VoxReactor
         public String CurrentState { get; }
 
         public readonly ObserverRegistry observerRegistry;
-        public static string REGISTRY_START_SPEAKING = "startSpeaking";
-        public static string REGISTRY_STOP_SPEAKING = "stopSpeaking";
+        public static string REGISTRY_SPEAKING_START = "startSpeaking";
+        public static string REGISTRY_SPEAKING_STOP = "stopSpeaking";
 
 
         public StateManager(VoxtaCharacter character) {
@@ -37,12 +37,12 @@ namespace PPirate.VoxReactor
 
             if (newState == VoxtaPlugin.STATE_SPEAKING)
             {
-                observerRegistry.InvokeObservers(REGISTRY_START_SPEAKING);
+                observerRegistry.InvokeObservers(REGISTRY_SPEAKING_START);
                 character.voxtaService.conversationService
                     .OnCharacterSpeaking(character.atom);
             }
             else if (currentState == VoxtaPlugin.STATE_SPEAKING) {
-                observerRegistry.InvokeObservers(REGISTRY_STOP_SPEAKING);
+                observerRegistry.InvokeObservers(REGISTRY_SPEAKING_STOP);
             }
             
 
