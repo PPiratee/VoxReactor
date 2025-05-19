@@ -41,7 +41,7 @@ namespace PPirate.VoxReactor
 
         System.Random random = new System.Random();
         List<string> voiceLinesTouchPos = new List<string> {
-            "ooh", "...ooho", "ooh...", "hmm", "mmMm", "oo?", "ooh", "UH!"
+            "mm...", "...mm", "ooh...", "hmm", "mmMm", "oo?", "ooh", "UH!"
         };
         List<string> voiceLinesSlap = new List<string> {
             "ouch", "awh!", "ooh!", "ahh!!", "ahhh!", 
@@ -94,7 +94,7 @@ namespace PPirate.VoxReactor
             }
 
             currentlyTouching.Add(part);
-            //character.voxtaService.RequestCharacterSpeech(GetRandomItem(voiceLinesTouchPos));todo make optional
+           // character.voxtaService.RequestCharacterSpeech(GetRandomItem(voiceLinesTouchPos));todo make optional
 
             if (!TouchReactionEvent(part))
                 character.voxtaService.SendSecret($"{character.voxtaService.userName} started touching {character.name}'s: " + part);
