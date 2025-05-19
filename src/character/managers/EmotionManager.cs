@@ -72,20 +72,39 @@ namespace PPirate.VoxReactor
                 logger.Constructor();
                 this.character = character;
 
+                blushManager = new BlushManager(character);
+                AddChild(blushManager);
+
+                emotionsConfig = ConfigVoxReactor.singeton.GetCharacterConfig(character).emotionConfig;
+
+                AddCallback(emotionsConfig.emotionsEnabled, EmotionsEnabledToggle);
+
+
+
+
                 hornieness = new Hornieness(this);
                 concurrentEmotions.Add(hornieness);
+                AddChild(hornieness);
 
                 happyness = new Happyness(this);
                 mainEmotions.Add(happyness);
-               
+                AddChild(happyness);
+
+
                 sadness = new Sadness(this);
                 mainEmotions.Add(sadness);
+                AddChild(sadness);
+
 
                 anger = new Anger(this);
                 mainEmotions.Add(anger);
+                AddChild(anger);
+
 
                 embarrasement = new Embarrassment(this);
                 concurrentEmotions.Add(embarrasement);
+                AddChild(embarrasement);
+
 
                 allEmotions.AddRange(mainEmotions);
                 allEmotions.AddRange(concurrentEmotions);
@@ -110,12 +129,7 @@ namespace PPirate.VoxReactor
 
 
 
-                blushManager = new BlushManager(character);
-                AddChild(blushManager);
-
-                emotionsConfig = ConfigVoxReactor.singeton.GetCharacterConfig(character).emotionConfig;
-
-                AddCallback(emotionsConfig.emotionsEnabled, EmotionsEnabledToggle);
+                
                 
 
                 UpdateContext(null);
@@ -197,13 +211,14 @@ namespace PPirate.VoxReactor
         
         string lastContextItem;
         public Emotion currentStrongestEmotion;
-        private void UpdateContext(Emotion emotionThatChanged) {
+        public void UpdateContext(Emotion emotionThatChanged) {
             logger.DEBUG("EmotionManager UpdateContext()");
             
             if (lastContextItem != null) { 
                 character.voxtaService.voxtaContextService.RemoveContextItem(lastContextItem);
             }
-            string context = character.name + "'s current mood:";
+            string contextBase = character.name + "'s current mood:";
+            string context = contextBase;
          
 
 
@@ -247,11 +262,12 @@ namespace PPirate.VoxReactor
                    // context += ".";
                 }
             }
-
-            character.voxtaService.voxtaContextService.AddContextItem(context);
+            if(context != contextBase)
+                character.voxtaService.voxtaContextService.AddContextItem(context);
             lastContextItem = context;
             DebugLogEmotions();
         }
+
         private void EnableContext() {
             character.voxtaService.voxtaContextService.AddContextItem(lastContextItem);
         }
@@ -268,20 +284,58 @@ namespace PPirate.VoxReactor
         }
 
     }
-    internal abstract class Emotion {
+    internal abstract class Emotion : SafeMvr
+    {
         protected EmotionManager emotionManager;
         public readonly string name;
         public float value;
+        protected ConfigCharacterSpecificEmotion config;
 
-        
 
+        IEnumerator decayEnumerator;
         public Emotion(EmotionManager emotionManager, string name, float startingValue) {
             this.emotionManager = emotionManager;
             this.name = name;
             this.value = startingValue;
-        }
 
+            config = emotionManager.emotionsConfig.GetEmotionConfigByName(name);
+
+            AddCallback(config.emotionEnabled, OnEnableToggleChanged);
+
+            RunDecayEnumerator();
+
+
+        }
+        private void RunDecayEnumerator() {
+            decayEnumerator = DecayEnumerator();
+            //SuperController.LogError("running decay");
+            Main.singleton.RunCoroutine(decayEnumerator);
+        }
+        IEnumerator DecayEnumerator()
+        {
+            float secondsToWait = config.decayInterval.val;
+            yield return new WaitForSeconds(secondsToWait);
+            DecayUpdate(secondsToWait);
+            emotionManager.UpdateContext(null);
+        }
+        private void DecayUpdate(float secondsWaited) { 
+            float decayIncrement = (secondsWaited/60f) * config.decayRate.val;
+            Decrease(-decayIncrement);
+            if (value != 0) { 
+                RunDecayEnumerator();
+            }
+            else
+            {
+                decayEnumerator = null;
+            }
+        }
+        void OnEnableToggleChanged(bool val) {
+            emotionManager.UpdateContext(null);
         
+        }
+        
+
+
 
         public void Increase(float increment, bool effectOtherEmotions = true) {
             emotionManager.logger.StartMethod("EmotionIncrease " + this.name);
@@ -289,6 +343,10 @@ namespace PPirate.VoxReactor
             IncreaseOverride(increment);
             if(effectOtherEmotions)
                 EffectOtherEmotions(increment);
+
+            if(decayEnumerator == null)
+                RunDecayEnumerator();
+
 
         }
         protected abstract void IncreaseOverride(float increment);
@@ -352,13 +410,15 @@ namespace PPirate.VoxReactor
 
             return newVal;
         }
-        public string GetInfo() { 
-            return string.Format("({0}: {1}%)", name, value);
+        public string GetInfo() {
+            //return string.Format("({0}: {1}%)", name, value);
+            return string.Format("({0}: {1}%)", name, (int)Math.Round(value));
+
 
         }
 
         public virtual bool ShouldShowInContext() { 
-            return value != 0;
+            return config.emotionEnabled.val && value != 0;
         }
 
         public void EffectOtherEmotions(float increment) {
@@ -393,7 +453,8 @@ namespace PPirate.VoxReactor
         }
         public override bool ShouldShowInContext()
         {
-            return this == emotionManager.currentStrongestEmotion && value != 0;
+            return  base.ShouldShowInContext()
+                && this == emotionManager.currentStrongestEmotion;
         }
 
     }
@@ -415,7 +476,8 @@ namespace PPirate.VoxReactor
         }
         public override bool ShouldShowInContext()
         {
-            return this == emotionManager.currentStrongestEmotion && value != 0;
+            return base.ShouldShowInContext()
+                && this == emotionManager.currentStrongestEmotion;
         }
 
     }
@@ -435,7 +497,8 @@ namespace PPirate.VoxReactor
         }
         public override bool ShouldShowInContext()
         {
-            return this == emotionManager.currentStrongestEmotion && value != 0;
+            return base.ShouldShowInContext()
+                && this == emotionManager.currentStrongestEmotion;
         }
     }
     internal class Embarrassment : Emotion
@@ -463,7 +526,7 @@ namespace PPirate.VoxReactor
         }
         public override bool ShouldShowInContext()
         {
-            return value != 0;
+            return base.ShouldShowInContext();
         }
     }
     internal class Hornieness : Emotion
@@ -496,7 +559,7 @@ namespace PPirate.VoxReactor
         }
         public override bool ShouldShowInContext()
         {
-            return value != 0;
+            return base.ShouldShowInContext();
         }
         public override void ApplyExpressionReaction()
         {

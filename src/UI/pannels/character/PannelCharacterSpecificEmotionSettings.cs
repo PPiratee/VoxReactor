@@ -22,37 +22,47 @@ namespace PPirate.VoxReactor
             ClearPannelUI();
             MakeBackButton();
 
-            string info = "Multipliers: If this emotion is increased by X, then emotion B's value is increased by X * BMultiplier";
+            string info = "DecayRate: how quickly this emotion will decrease in percent/minute";
+            info.CreateStaticInfo(120, uiElements, false);
 
-         
+            info = "DecayInterval: how many seconds pass in between applying the decay";
+            info.CreateStaticInfo(120, uiElements, false);
+
+            info = "Multipliers: If this emotion is increased by X, then emotion B's value is increased by X * BMultiplier";
             info.CreateStaticInfo(120, uiElements, false);
 
             var contextEnabledToggle = (UIDynamicToggle)emotionConfig.emotionEnabled.CreateUI(uiElements, false);
             contextEnabledToggle.label = $"{emotionConfig.emotionName} enabled";
 
+            var slider = (UIDynamicSlider)emotionConfig.decayRate.CreateUI(uiElements, false);
+            slider.label = $"DecayRate";
+
+            slider = (UIDynamicSlider)emotionConfig.decayInterval.CreateUI(uiElements, false);
+            slider.label = $"DecayInterval";
+
             if (emotionConfig.emotionName != Hornieness.hornieNessName) {
-                var hornySlider = (UIDynamicSlider)emotionConfig.hornynessMultiplier.CreateUI(uiElements, false);
-                hornySlider.label = $"HornynessMultiplier";
+                slider = (UIDynamicSlider)emotionConfig.hornynessMultiplier.CreateUI(uiElements, false);
+                slider.label = $"HornynessMultiplier";
             }
             if (emotionConfig.emotionName != Happyness.happynessName)
             {
-                var hornySlider = (UIDynamicSlider)emotionConfig.happynessMultiplier.CreateUI(uiElements, false);
-                hornySlider.label = $"HappynessMultiplier";
+                slider = (UIDynamicSlider)emotionConfig.happynessMultiplier.CreateUI(uiElements, false);
+                slider.label = $"HappynessMultiplier";
             }
             if (emotionConfig.emotionName != Sadness.sadnessName)
             {
-                var sadSLider = (UIDynamicSlider)emotionConfig.sadnessMultiplier.CreateUI(uiElements, false);
-                sadSLider.label = $"SadnessMultiplier";
+                slider = (UIDynamicSlider)emotionConfig.sadnessMultiplier.CreateUI(uiElements, false);
+                slider.label = $"SadnessMultiplier";
             }
             if (emotionConfig.emotionName != Anger.angerName)
             {
-                var sadSLider = (UIDynamicSlider)emotionConfig.angerMultiplier.CreateUI(uiElements, false);
-                sadSLider.label = $"AngerMultiplier";
+                slider = (UIDynamicSlider)emotionConfig.angerMultiplier.CreateUI(uiElements, false);
+                slider.label = $"AngerMultiplier";
             }
             if (emotionConfig.emotionName != Embarrassment.embarrassmentName)
             {
-                var sadSLider = (UIDynamicSlider)emotionConfig.embarrassmentMultiplier.CreateUI(uiElements, false);
-                sadSLider.label = $"EmbarrasementMultiplier";
+                slider = (UIDynamicSlider)emotionConfig.embarrassmentMultiplier.CreateUI(uiElements, false);
+                slider.label = $"EmbarrasementMultiplier";
             }
 
 

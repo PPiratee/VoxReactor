@@ -26,6 +26,7 @@ namespace PPirate.VoxReactor
                 .SetAngerMultiplier(-1)
                 .SetSadnessMultiplier(-1);
             configs.Add(hornienessConfig);
+         
 
             happynessConfig = new ConfigCharacterSpecificEmotion(Happyness.happynessName, this)
                 .SetAngerMultiplier(-1)

@@ -8,15 +8,16 @@ namespace PPirate.VoxReactor
 
         public readonly string emotionName;
         public readonly JSONStorableBool emotionEnabled;
+        public readonly JSONStorableFloat decayRate;
+        public readonly JSONStorableFloat decayInterval;
+
         public readonly JSONStorableFloat hornynessMultiplier;
         public readonly JSONStorableFloat happynessMultiplier;
         public readonly JSONStorableFloat sadnessMultiplier;
         public readonly JSONStorableFloat angerMultiplier;
         public readonly JSONStorableFloat embarrassmentMultiplier;
 
-
-
-
+        
 
         public ConfigCharacterSpecificEmotion(string emotionName, ConfigInstanceStorable parent): base(emotionName, parent) {
 
@@ -24,6 +25,14 @@ namespace PPirate.VoxReactor
   
             emotionEnabled = new JSONStorableBool(GetStorableId("EmotionEnabled"), true);
             Main.singleton.RegisterBool(emotionEnabled);
+
+            this.decayRate = new JSONStorableFloat(GetStorableId("DecayRate"), 10, 0, 100);
+            Main.singleton.RegisterFloat(this.decayRate);
+
+            this.decayInterval = new JSONStorableFloat(GetStorableId("DecayInterval"), 5, 1, 60);
+            Main.singleton.RegisterFloat(this.decayInterval);
+
+
 
             this.hornynessMultiplier = new JSONStorableFloat(GetStorableId("HornynessMultiplier"), 0, -10, 10);
             Main.singleton.RegisterFloat(this.hornynessMultiplier);
@@ -39,6 +48,8 @@ namespace PPirate.VoxReactor
 
             this.embarrassmentMultiplier = new JSONStorableFloat(GetStorableId("EmbarrasementMultiplier"), 0, -10, 10);
             Main.singleton.RegisterFloat(this.embarrassmentMultiplier);
+
+            
 
         }
 
