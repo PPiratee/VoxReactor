@@ -70,7 +70,7 @@ namespace PPirate.VoxReactor
             transationTarget = translationTestTarg;//temp
 
 
-            rotateCheck = new IntervalCoroutine(followInterval, CheckShouldRotateToTarget);
+            rotateCheck = new IntervalCoroutine(followInterval, FollowRotationIntervalCallback);
             rotateCheck.Run();//temp
 
             translateCheck = new IntervalCoroutine(followInterval, CheckShouldFollow);
@@ -81,7 +81,8 @@ namespace PPirate.VoxReactor
             Main.singleton.RegisterAction(OnDestinationReached);
         }
 
-        public void ToggleFollowTranslation(bool val) {
+        public void ToggleFollowRotation(bool val) {
+            
             //todo check for target
 
             if (val && !shouldFollowRotation)
@@ -94,7 +95,7 @@ namespace PPirate.VoxReactor
             }
         }
 
-        public void ToggleFollowRotation(bool val)
+        public void ToggleFollowTranslation(bool val)
         {
             //todo check for target
 
@@ -107,7 +108,13 @@ namespace PPirate.VoxReactor
                 translateCheck.Stop();
             }
         }
-        public void CheckShouldRotateToTarget() {
+        private void FollowRotationIntervalCallback() {
+            if (CheckShouldFollowRotate()) {
+                //UpdateRotationTargetPostion();
+                Main.singleton.PushFixedDeltaTimeConsumer(FollowRotation);
+            }
+        }
+        public bool CheckShouldFollowRotate() {
             //todo check for target
             //SuperController.LogError("CheckShouldRotateToTarget");
 
@@ -129,10 +136,7 @@ namespace PPirate.VoxReactor
 
 
             float delta = Vector2.SignedAngle(hipForward2.normalized, hipsToTarget2.normalized);
-            if (Mathf.Abs(delta) >= followRotateDeadZone)
-            {
-                UpdateRotationTargetPostion();
-            }
+            return Mathf.Abs(delta) >= followRotateDeadZone;
         }
         public void CheckShouldFollow() {
             Vector3 targetPosition = transationTarget.mainController.control.position;
@@ -153,6 +157,18 @@ namespace PPirate.VoxReactor
             catch (Exception e) {
                 SuperController.LogError(e.Message);
             }
+        }
+        private void FollowRotation(float fixedTime)
+        {//fixed update consumer
+            if (CheckShouldFollowRotate())
+            {
+                UpdateRotationTargetPostion();
+            }
+            else {
+                Main.singleton.RemoveFixedDeltaTimeConsumer(FollowRotation);
+            }
+
+                
         }
         private void UpdateTranslationTargetPostion()
         {
