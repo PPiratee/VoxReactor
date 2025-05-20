@@ -11,6 +11,7 @@ using Leap.Unity.Query;
 using System.Linq;
 using System.CodeDom;
 using Leap;
+using UnityStandardAssets.ImageEffects;
 namespace PPirate.VoxReactor
 {
     internal class LocomotionManager : SafeMvr
@@ -27,17 +28,21 @@ namespace PPirate.VoxReactor
         private readonly Atom translationControl;
         private Atom transationTarget;
         private Atom translationTestTarg;//TEST
-        private bool isFollowTargetTranslation = true;
+        
+        private bool isFollowTranslation = false;
+        private bool shouldFollowTranslation = true;
 
         IntervalCoroutine translateCheck;
         private float followTranslationDistance = 1f;
+        private readonly JSONStorableAction OnDestinationReached;
+
 
         //ROTATION
         private readonly Atom rotationControl;
         private Atom rotationTarget;
         private Atom rotationTestTarg;//TEST
 
-        private bool isFollowTargetRotation = true;
+        private bool shouldFollowRotation = true;
 
         IntervalCoroutine rotateCheck;
         private float followRotateDeadZone = 30f;
@@ -71,16 +76,19 @@ namespace PPirate.VoxReactor
             translateCheck = new IntervalCoroutine(followInterval, CheckShouldFollow);
             translateCheck.Run();//temp
 
+
+            OnDestinationReached = new JSONStorableAction($"OnDestinationReached_{character.role}", OnDestinationReachedCallback);
+            Main.singleton.RegisterAction(OnDestinationReached);
         }
 
         public void ToggleFollowTranslation(bool val) {
             //todo check for target
 
-            if (val && !isFollowTargetRotation)
+            if (val && !shouldFollowRotation)
             {
                 rotateCheck.Run();
             }
-            else if(!val && isFollowTargetRotation)
+            else if(!val && shouldFollowRotation)
             {
                 rotateCheck.Stop();
             }
@@ -90,11 +98,11 @@ namespace PPirate.VoxReactor
         {
             //todo check for target
 
-            if (val && !isFollowTargetTranslation)
+            if (val && !shouldFollowTranslation)
             {
                 translateCheck.Run();
             }
-            else if (!val && isFollowTargetTranslation)
+            else if (!val && shouldFollowTranslation)
             {
                 translateCheck.Stop();
             }
@@ -131,17 +139,16 @@ namespace PPirate.VoxReactor
             Vector3 hipPosition = hipController.control.position;
             Vector3 hipsToTarget = targetPosition - hipPosition;
             float distance = (Vector3.ProjectOnPlane(hipsToTarget, Vector3.up).magnitude);
-            SuperController.LogError("DistanceIs" + distance);
             if (distance >= followTranslationDistance) {
-                UpdateTranslationTargetPostion();
+                //UpdateTranslationTargetPostion();
+                Main.singleton.PushFixedDeltaTimeConsumer(FollowTranslation);
+                isFollowTranslation = true;
             }
         }
         private void UpdateRotationTargetPostion() {
             try
             {
-
                 rotationControl.mainController.SetPositionNoForce(rotationTarget.mainController.control.position);
-
             }
             catch (Exception e) {
                 SuperController.LogError(e.Message);
@@ -151,15 +158,20 @@ namespace PPirate.VoxReactor
         {
             try
             {
-                SuperController.LogError("Translating");
-
                 translationControl.mainController.SetPositionNoForce(transationTarget.mainController.control.position);
-
             }
             catch (Exception e)
             {
                 SuperController.LogError(e.Message);
             }
+        }
+        
+        private void FollowTranslation(float fixedTime) {//fixed update consumer
+            UpdateTranslationTargetPostion();
+        }
+        public void OnDestinationReachedCallback() {
+            Main.singleton.RemoveFixedDeltaTimeConsumer(FollowTranslation);
+            SuperController.LogError("Destination reached");
         }
 
         private class IntervalCoroutine

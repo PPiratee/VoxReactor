@@ -13,6 +13,7 @@ namespace PPirate.VoxReactor
 
     public class Main : MVRScript
     {
+
         private readonly SafeMvr safeMvr = new SafeMvr();
         private readonly Logger logger = new Logger("Main");
 
@@ -73,7 +74,11 @@ namespace PPirate.VoxReactor
             fixedUpdateTimeConsumers.Add(callback);
         }
         public void RemoveFixedDeltaTimeConsumer(Action<float> callback) {
-            consumersToRemove.Add(callback);
+            if (fixedUpdateTimeConsumers.Contains(callback))
+            {
+                consumersToRemove.Add(callback);
+            }
+            
         }
 
         void FixedUpdate()
