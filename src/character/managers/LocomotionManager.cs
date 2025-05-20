@@ -34,7 +34,6 @@ namespace PPirate.VoxReactor
 
         IntervalCoroutine translateCheck;
         private float followTranslationDistance = 1f;
-        private readonly JSONStorableAction OnDestinationReached;
 
 
         //ROTATION
@@ -47,10 +46,14 @@ namespace PPirate.VoxReactor
 
         IntervalCoroutine rotateCheck;
         private float followRotateDeadZone = 30f;
+        private float followRotateDeadZoneStop = 1f;
 
 
 
         private float followInterval = 0.5f; //seconds
+
+
+   
 
 
         public LocomotionManager(VoxtaCharacter character) { 
@@ -77,9 +80,7 @@ namespace PPirate.VoxReactor
             translateCheck = new IntervalCoroutine(followInterval, FollowTranslationIntervalCallback);
             translateCheck.Run();//temp
 
-
-            OnDestinationReached = new JSONStorableAction($"OnDestinationReached_{character.role}", OnDestinationReachedCallback);
-            Main.singleton.RegisterAction(OnDestinationReached);
+            Main.singleton.RegisterAction(new JSONStorableAction( "char_"+character.characterNumber+"_OnDestinationReached", OnDestinationReachedCallback));
         }
 
         public void ToggleFollowRotation(bool val) {
@@ -93,6 +94,7 @@ namespace PPirate.VoxReactor
             else if(!val && shouldFollowRotation)
             {
                 rotateCheck.Stop();
+                Main.singleton.RemoveFixedDeltaTimeConsumer(FollowRotation);
             }
         }
 
@@ -107,16 +109,19 @@ namespace PPirate.VoxReactor
             else if (!val && shouldFollowTranslation)
             {
                 translateCheck.Stop();
+                Main.singleton.RemoveFixedDeltaTimeConsumer(FollowTranslation);
             }
         }
         private void FollowRotationIntervalCallback() {
-            if (CheckShouldFollowRotate()) {
+            if (CheckShouldFollowRotate(followRotateDeadZone)) {
                 //UpdateRotationTargetPostion();
+                clsPlugin.ToggleEnabled(true);
+
                 Main.singleton.PushFixedDeltaTimeConsumer(FollowRotation);
                 isFollowRotation = true;
             }
         }
-        public bool CheckShouldFollowRotate() {
+        public bool CheckShouldFollowRotate(float targetVal) {
             //todo check for target
             //SuperController.LogError("CheckShouldRotateToTarget");
 
@@ -138,12 +143,13 @@ namespace PPirate.VoxReactor
 
 
             float delta = Vector2.SignedAngle(hipForward2.normalized, hipsToTarget2.normalized);
-            return Mathf.Abs(delta) >= followRotateDeadZone;
+            return Mathf.Abs(delta) >= targetVal;
         }
         private void FollowTranslationIntervalCallback()
         {
             if (CheckShouldFollow())
             {
+                clsPlugin.ToggleEnabled(true);
                 //UpdateRotationTargetPostion();
                 Main.singleton.PushFixedDeltaTimeConsumer(FollowTranslation);
                 isFollowTranslation = true;
@@ -167,15 +173,20 @@ namespace PPirate.VoxReactor
         }
         private void FollowRotation(float fixedTime)
         {//fixed update consumer
-            if (CheckShouldFollowRotate())
+            if (CheckShouldFollowRotate(followRotateDeadZoneStop))
             {
                 UpdateRotationTargetPostion();
             }
             else {
+                isFollowRotation = false;
                 Main.singleton.RemoveFixedDeltaTimeConsumer(FollowRotation);
+                if (!isFollowTranslation) {
+                    clsPlugin.ToggleEnabled(false);
+                }
+
             }
 
-                
+
         }
         private void UpdateTranslationTargetPostion()
         {
@@ -198,12 +209,20 @@ namespace PPirate.VoxReactor
             }
             else
             {
+                isFollowTranslation = false;
                 Main.singleton.RemoveFixedDeltaTimeConsumer(FollowTranslation);
+
             }
         }
+
         public void OnDestinationReachedCallback() {
-          //  Main.singleton.RemoveFixedDeltaTimeConsumer(FollowTranslation);
+            
             //SuperController.LogError("Destination reached");
+
+            if (!isFollowRotation)
+            {
+                clsPlugin.ToggleEnabled(false);
+            }
         }
 
         private class IntervalCoroutine
