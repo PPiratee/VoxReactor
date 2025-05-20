@@ -15,23 +15,37 @@ namespace PPirate.VoxReactor
 {
     internal class LocomotionManager : SafeMvr
     {
-        Atom translationControl;
         
-        VoxtaCharacter character;
-        ClsPlugin clsPlugin;
+        private readonly VoxtaCharacter character;
+        private readonly ClsPlugin clsPlugin;
 
-        FreeControllerV3 hipController;
+        private readonly FreeControllerV3 hipController;
 
-        Atom testTarg;
+        
+        //TRANSLATION
 
-        Atom rotationControl;
-        Atom rotationTarget;
+        private readonly Atom translationControl;
+        private Atom transationTarget;
+        private Atom translationTestTarg;//TEST
+        private bool isFollowTargetTranslation = true;
 
-        private bool shouldRotateToTarget = true;
-        private float rotateDeadZone = 30f;
-        private float rotateCheckInterval = 0.5f; //seconds
+        IntervalCoroutine translateCheck;
+        private float followTranslationDistance = 1f;
+
+        //ROTATION
+        private readonly Atom rotationControl;
+        private Atom rotationTarget;
+        private Atom rotationTestTarg;//TEST
+
+        private bool isFollowTargetRotation = true;
 
         IntervalCoroutine rotateCheck;
+        private float followRotateDeadZone = 30f;
+
+
+
+        private float followInterval = 0.5f; //seconds
+
 
         public LocomotionManager(VoxtaCharacter character) { 
             this.character = character;
@@ -43,40 +57,56 @@ namespace PPirate.VoxReactor
 
 
 
-            testTarg = Main.singleton.GetAtomById("test_targ_r");//todo this is temporary
-            rotationTarget = testTarg;
-            SuperController.LogError("loc" + rotationTarget.mainController.control.position);
- 
+            rotationTestTarg = Main.singleton.GetAtomById("test_targ_r");//todo this is temporary 
+            rotationTarget = rotationTestTarg;//temp
+            //SuperController.LogError("loc" + rotationTarget.mainController.control.position);
+
+            translationTestTarg = Main.singleton.GetAtomById("test_targ_t");//todo temp
+            transationTarget = translationTestTarg;//temp
 
 
-            rotateCheck = new IntervalCoroutine(rotateCheckInterval, CheckShouldRotateToTarget);
-            rotateCheck.Run();
+            rotateCheck = new IntervalCoroutine(followInterval, CheckShouldRotateToTarget);
+            rotateCheck.Run();//temp
 
+            translateCheck = new IntervalCoroutine(followInterval, CheckShouldFollow);
+            translateCheck.Run();//temp
 
         }
 
-        public void ToggleRotateToTarget(bool val) {
+        public void ToggleFollowTranslation(bool val) {
             //todo check for target
 
-            if (val && !shouldRotateToTarget)
+            if (val && !isFollowTargetRotation)
             {
                 rotateCheck.Run();
             }
-            else if(!val && shouldRotateToTarget)
+            else if(!val && isFollowTargetRotation)
             {
                 rotateCheck.Stop();
             }
-                
+        }
 
+        public void ToggleFollowRotation(bool val)
+        {
+            //todo check for target
+
+            if (val && !isFollowTargetTranslation)
+            {
+                translateCheck.Run();
+            }
+            else if (!val && isFollowTargetTranslation)
+            {
+                translateCheck.Stop();
+            }
         }
         public void CheckShouldRotateToTarget() {
             //todo check for target
             //SuperController.LogError("CheckShouldRotateToTarget");
 
-            Vector3 targetPosition = rotationTarget.mainController.control.position; // TODO: get actual value
+            Vector3 targetPosition = rotationTarget.mainController.control.position;
 
             Vector3 hipPosition = hipController.control.position;
-            Vector3 hipForward = hipController.control.forward; // TODO: get actual value
+            Vector3 hipForward = hipController.control.forward; 
 
             // Direction from hips to target
             Vector3 hipsToTarget = targetPosition - hipPosition;
@@ -89,32 +119,46 @@ namespace PPirate.VoxReactor
             Vector3 hipForwardProjected = Vector3.ProjectOnPlane(hipForward, Vector3.up);
             Vector2 hipForward2 = new Vector2(hipForwardProjected.x, hipForwardProjected.z);
 
-            // Calculate signed angle between the two vectors in degrees
-            float delta = Vector2.SignedAngle(hipForward2.normalized, hipsToTarget2.normalized);
 
-            //// Use absolute value if you only care about magnitude
-            if (Mathf.Abs(delta) >= rotateDeadZone)
+            float delta = Vector2.SignedAngle(hipForward2.normalized, hipsToTarget2.normalized);
+            if (Mathf.Abs(delta) >= followRotateDeadZone)
             {
                 UpdateRotationTargetPostion();
             }
-            else
-            {
-                //disable rotaiton
-                // nah do nothing
+        }
+        public void CheckShouldFollow() {
+            Vector3 targetPosition = transationTarget.mainController.control.position;
+            Vector3 hipPosition = hipController.control.position;
+            Vector3 hipsToTarget = targetPosition - hipPosition;
+            float distance = (Vector3.ProjectOnPlane(hipsToTarget, Vector3.up).magnitude);
+            SuperController.LogError("DistanceIs" + distance);
+            if (distance >= followTranslationDistance) {
+                UpdateTranslationTargetPostion();
             }
-
-
-
         }
         private void UpdateRotationTargetPostion() {
             try
             {
-                //SuperController.LogError((rotationControl.mainController == null).ToString());
+
                 rotationControl.mainController.SetPositionNoForce(rotationTarget.mainController.control.position);
 
             }
             catch (Exception e) {
-                //SuperController.LogError(e.Message);
+                SuperController.LogError(e.Message);
+            }
+        }
+        private void UpdateTranslationTargetPostion()
+        {
+            try
+            {
+                SuperController.LogError("Translating");
+
+                translationControl.mainController.SetPositionNoForce(transationTarget.mainController.control.position);
+
+            }
+            catch (Exception e)
+            {
+                SuperController.LogError(e.Message);
             }
         }
 
