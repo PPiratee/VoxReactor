@@ -42,6 +42,7 @@ namespace PPirate.VoxReactor
         private Atom rotationTarget;
         private Atom rotationTestTarg;//TEST
 
+        private bool isFollowRotation = false;
         private bool shouldFollowRotation = true;
 
         IntervalCoroutine rotateCheck;
@@ -73,7 +74,7 @@ namespace PPirate.VoxReactor
             rotateCheck = new IntervalCoroutine(followInterval, FollowRotationIntervalCallback);
             rotateCheck.Run();//temp
 
-            translateCheck = new IntervalCoroutine(followInterval, CheckShouldFollow);
+            translateCheck = new IntervalCoroutine(followInterval, FollowTranslationIntervalCallback);
             translateCheck.Run();//temp
 
 
@@ -112,6 +113,7 @@ namespace PPirate.VoxReactor
             if (CheckShouldFollowRotate()) {
                 //UpdateRotationTargetPostion();
                 Main.singleton.PushFixedDeltaTimeConsumer(FollowRotation);
+                isFollowRotation = true;
             }
         }
         public bool CheckShouldFollowRotate() {
@@ -138,16 +140,21 @@ namespace PPirate.VoxReactor
             float delta = Vector2.SignedAngle(hipForward2.normalized, hipsToTarget2.normalized);
             return Mathf.Abs(delta) >= followRotateDeadZone;
         }
-        public void CheckShouldFollow() {
+        private void FollowTranslationIntervalCallback()
+        {
+            if (CheckShouldFollow())
+            {
+                //UpdateRotationTargetPostion();
+                Main.singleton.PushFixedDeltaTimeConsumer(FollowTranslation);
+                isFollowTranslation = true;
+            }
+        }
+        public bool CheckShouldFollow() {
             Vector3 targetPosition = transationTarget.mainController.control.position;
             Vector3 hipPosition = hipController.control.position;
             Vector3 hipsToTarget = targetPosition - hipPosition;
             float distance = (Vector3.ProjectOnPlane(hipsToTarget, Vector3.up).magnitude);
-            if (distance >= followTranslationDistance) {
-                //UpdateTranslationTargetPostion();
-                Main.singleton.PushFixedDeltaTimeConsumer(FollowTranslation);
-                isFollowTranslation = true;
-            }
+            return distance >= followTranslationDistance;
         }
         private void UpdateRotationTargetPostion() {
             try
@@ -184,10 +191,19 @@ namespace PPirate.VoxReactor
         
         private void FollowTranslation(float fixedTime) {//fixed update consumer
             UpdateTranslationTargetPostion();
+
+            if (CheckShouldFollow())
+            {
+                UpdateTranslationTargetPostion();
+            }
+            else
+            {
+                Main.singleton.RemoveFixedDeltaTimeConsumer(FollowTranslation);
+            }
         }
         public void OnDestinationReachedCallback() {
-            Main.singleton.RemoveFixedDeltaTimeConsumer(FollowTranslation);
-            SuperController.LogError("Destination reached");
+          //  Main.singleton.RemoveFixedDeltaTimeConsumer(FollowTranslation);
+            //SuperController.LogError("Destination reached");
         }
 
         private class IntervalCoroutine
