@@ -133,24 +133,33 @@ namespace PPirate.VoxReactor
                 break;
             }
         }
-    void OnDestroy() {
-            logger.StartMethod("OnDestroy()");
+        void OnDestroy() {
+                logger.StartMethod("OnDestroy()");
 
-           // voxtaService.CleanUp();
-            safeMvr.CleanUpCallbacks();
-            Utils.OnDestroyUI();
-    }
-    private void LoadVoxtaService() {
-            logger.StartMethod("LoadVoxtaService()");
-
-            safeMvr.RemoveChild(voxtaService);
-            voxtaService = new VoxtaService(this, voxtaPlugin);
-            safeMvr.AddChild(voxtaService);
-
-            mainPannel.characterPannel.OnVoxCharactersLoaded();
-            DrawUI();
+               // voxtaService.CleanUp();
+                safeMvr.CleanUpCallbacks();
+                Utils.OnDestroyUI();
         }
+        private void LoadVoxtaService() {
+                logger.StartMethod("LoadVoxtaService()");
+
+                safeMvr.RemoveChild(voxtaService);
+                voxtaService = new VoxtaService(this, voxtaPlugin);
+                safeMvr.AddChild(voxtaService);
+
+                mainPannel.characterPannel.OnVoxCharactersLoaded();
+                DrawUI();
+            }
+        void OnDrawGizmos()
+        {
+            SuperController.LogError("DRAWING");
+            Gizmos.color = Color.red;
+            Gizmos.DrawRay(Vector3.zero, transform.up * 8000);
+        }
+
     }
+
+
 
     #endregion
 

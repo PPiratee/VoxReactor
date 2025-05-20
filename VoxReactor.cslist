@@ -9,6 +9,7 @@ src\character\managers\TouchManager.cs
 src\character\managers\LookingAtManager.cs
 src\character\managers\ClothingManager.cs
 src\character\managers\ExpressionManager.cs
+src\character\managers\LocomotionManager.cs
 src\character\managers\sex\SexManager.cs
 src\character\managers\sex\HandJobManager.cs
 src\character\managers\sex\BlowJobManager.cs
@@ -27,6 +28,7 @@ src\plugins\person\SilverHandJobPlugin.cs
 src\plugins\person\SilverBlowJobPlugin.cs
 src\plugins\person\PoseMePlugin.cs
 src\plugins\person\ExpressionRouterPlugin.cs
+src\plugins\person\ClsPlugin.cs
 src\plugins\VoxtaPlugin.cs
 src\services\VoxtaService.cs 
 src\services\VoxtaContextService.cs 

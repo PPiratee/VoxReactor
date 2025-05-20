@@ -19,6 +19,7 @@ namespace PPirate.VoxReactor
             bjPlugin = new SilverBlowJobPlugin(character);
             poseMePlugin = new PoseMePlugin(character);
             expressionRouterPlugin = new ExpressionRouterPlugin(character);
+            clsPlugin = new ClsPlugin(character);
         }
         public AcidGlancePlugin glancePlugin;
         public ReadMyLipsPlugin readMyLipsPlugin;
@@ -28,6 +29,7 @@ namespace PPirate.VoxReactor
         public PoseMePlugin poseMePlugin;
         public HeadTimeLine headTimeLine;
         public ExpressionRouterPlugin expressionRouterPlugin;
+        public ClsPlugin clsPlugin;
 
     }
 }
