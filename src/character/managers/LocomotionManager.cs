@@ -30,7 +30,7 @@ namespace PPirate.VoxReactor
         private Atom translationTestTarg;//TEST
         
         private bool isFollowTranslation = false;
-        private bool shouldFollowTranslation = true;
+        private bool shouldFollowTranslation = false;
 
         IntervalCoroutine translateCheck;
         private float followTranslationDistance = 1f;
@@ -42,7 +42,7 @@ namespace PPirate.VoxReactor
         private Atom rotationTestTarg;//TEST
 
         private bool isFollowRotation = false;
-        private bool shouldFollowRotation = true;
+        private bool shouldFollowRotation = false;
 
         IntervalCoroutine rotateCheck;
         private float followRotateDeadZone = 30f;
@@ -75,24 +75,32 @@ namespace PPirate.VoxReactor
 
 
             rotateCheck = new IntervalCoroutine(followInterval, FollowRotationIntervalCallback);
-            rotateCheck.Run();//temp
+            //rotateCheck.Run();//temp
 
             translateCheck = new IntervalCoroutine(followInterval, FollowTranslationIntervalCallback);
-            translateCheck.Run();//temp
+            //translateCheck.Run();//temp
 
             Main.singleton.RegisterAction(new JSONStorableAction( "char_"+character.characterNumber+"_OnDestinationReached", OnDestinationReachedCallback));
         }
-
+        public void SetRotationTarget(Atom target) { 
+            this.rotationTarget = target;
+        }
+        public void SetTranslationTarget(Atom target)
+        {
+            this.transationTarget = target;
+        }
         public void ToggleFollowRotation(bool val) {
             
             //todo check for target
 
             if (val && !shouldFollowRotation)
             {
+                shouldFollowRotation = true;
                 rotateCheck.Run();
             }
             else if(!val && shouldFollowRotation)
             {
+                shouldFollowRotation = false;
                 rotateCheck.Stop();
                 Main.singleton.RemoveFixedDeltaTimeConsumer(FollowRotation);
             }
@@ -104,10 +112,13 @@ namespace PPirate.VoxReactor
 
             if (val && !shouldFollowTranslation)
             {
+                shouldFollowTranslation = true;
                 translateCheck.Run();
             }
             else if (!val && shouldFollowTranslation)
             {
+                shouldFollowTranslation = false;
+
                 translateCheck.Stop();
                 Main.singleton.RemoveFixedDeltaTimeConsumer(FollowTranslation);
             }

@@ -33,7 +33,7 @@ namespace PPirate.VoxReactor
         public readonly ShakeManager shakeManager;
         public readonly ClothingManager clothingManager;
         public readonly ExpressionManager expressionManager;
-        public readonly LocomotionManager locomotionManager;
+        public readonly NavigationManager navigationManager;
 
 
 
@@ -76,8 +76,9 @@ namespace PPirate.VoxReactor
                 dirtyTalkManager = new DirtyTalkManager(this);
                 AddChild(dirtyTalkManager);
                 shakeManager = new ShakeManager(this);
-                locomotionManager = new LocomotionManager(this);
-                AddChild(locomotionManager);
+                
+                navigationManager = new NavigationManager(this);
+                AddChild(navigationManager);
 
                 clothingManager = new ClothingManager(this);
 

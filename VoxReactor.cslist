@@ -10,6 +10,7 @@ src\character\managers\LookingAtManager.cs
 src\character\managers\ClothingManager.cs
 src\character\managers\ExpressionManager.cs
 src\character\managers\LocomotionManager.cs
+src\character\managers\NavigationManager.cs
 src\character\managers\sex\SexManager.cs
 src\character\managers\sex\HandJobManager.cs
 src\character\managers\sex\BlowJobManager.cs
