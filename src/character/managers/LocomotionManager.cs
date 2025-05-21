@@ -12,6 +12,8 @@ using System.Linq;
 using System.CodeDom;
 using Leap;
 using UnityStandardAssets.ImageEffects;
+using Technie.PhysicsCreator.QHull;
+using Battlehub.UIControls;
 namespace PPirate.VoxReactor
 {
     internal class LocomotionManager : SafeMvr
@@ -21,10 +23,12 @@ namespace PPirate.VoxReactor
         private readonly ClsPlugin clsPlugin;
 
         private readonly FreeControllerV3 hipController;
+        private readonly FreeControllerV3 neckController;
+        private readonly FreeControllerV3 headController;
 
 
 
-        
+
         //TRANSLATION
 
         private readonly Atom translationControl;
@@ -66,7 +70,8 @@ namespace PPirate.VoxReactor
             clsPlugin = character.plugins.clsPlugin;
             var personControllers = character.atom.freeControllers;
             hipController = Array.Find(personControllers, c => c.name == "hipControl");
-
+            neckController = Array.Find(personControllers, c => c.name == "neckControl");
+            headController = Array.Find(personControllers, c => c.name == "headControl");
 
 
             rotationTestTarg = Main.singleton.GetAtomById("test_targ_r");//todo this is temporary 
@@ -194,6 +199,11 @@ namespace PPirate.VoxReactor
         }
         private void FollowRotation(float fixedTime)
         {//fixed update consumer
+            //neckController.control.rotation;
+            //var headRotation = GetHeadRotation(headController.control, rotationTarget.mainController.control.position - neckController.control.position);
+            //    headController.control.SetPositionAndRotation(headController.control.position, headRotation);
+
+
             if (shouldLookAtTranslationTargetIfTranslating
                 && isFollowTranslation)
             {
@@ -202,6 +212,10 @@ namespace PPirate.VoxReactor
             if (CheckShouldFollowRotate(followRotateDeadZoneStop))
             {
                 UpdateRotationTargetPostion();
+                //var headRotation = GetHeadRotation(headController.control, rotationTarget.mainController.control.position - neckController.control.position);
+                //headController.control.SetPositionAndRotation(headController.control.position, headRotation);
+                //RotateHeadControl(fixedTime);
+                Main.singleton.PushFixedDeltaTimeConsumer(RotateHeadControl);
             }
             else {
                 isFollowRotation = false;
@@ -214,6 +228,34 @@ namespace PPirate.VoxReactor
 
 
         }
+        Quaternion GetHeadRotation(Transform head, Vector3 targetDirection)
+        {
+            // Project the target direction onto the plane orthogonal to head.up
+            Vector3 projectedDirection = Vector3.ProjectOnPlane(targetDirection, head.up).normalized;
+
+            if (projectedDirection.sqrMagnitude < 0.001f)
+            {
+                // Avoid zero-length vectors
+                return head.rotation;
+            }
+
+            // Calculate the rotation from current forward to projected direction, around head.up
+            Quaternion rotationDelta = Quaternion.FromToRotation(head.forward, projectedDirection);
+
+            // Constrain the rotation to only rotate around the head's up axis
+            Vector3 axis;
+            float angle;
+            rotationDelta.ToAngleAxis(out angle, out axis);
+
+            // Reproject the axis to be around head.up only
+            float signedAngle = Vector3.SignedAngle(head.forward, projectedDirection, head.up);
+            Quaternion constrainedRotation = Quaternion.AngleAxis(signedAngle, head.up);
+
+            // Apply the constrained rotation to the current rotation
+            return constrainedRotation * head.rotation;
+        }
+
+
         private void UpdateTranslationTargetPostion()
         {
             try
@@ -227,14 +269,16 @@ namespace PPirate.VoxReactor
         }
         
         private void FollowTranslation(float fixedTime) {//fixed update consumer
-            UpdateTranslationTargetPostion();
 
             if (CheckShouldFollow())
             {
                 UpdateTranslationTargetPostion();
                 if (shouldLookAtTranslationTargetIfTranslating) {
                     UpdateRotationTargetPostion();
+                    //var headRotation = GetHeadRotation(headController.control, rotationTarget.mainController.control.position - neckController.control.position);
+                    //headController.control.SetPositionAndRotation(headController.control.position, headRotation);
                 }
+                Main.singleton.PushFixedDeltaTimeConsumer(RotateHeadControl);
             }
             else
             {
@@ -243,6 +287,33 @@ namespace PPirate.VoxReactor
 
             }
         }
+        private bool rotatedHead = false;
+        private float headRotationDeadZone = 1f;
+        private void RotateHeadControl(float fixedDeltaTime) {
+            if (rotatedHead) {
+                rotatedHead = false;
+                return;
+            }
+            rotatedHead = true;
+            Vector3 lookTarget = rotationTarget.mainController.control.position - neckController.control.position;
+            var targetRotation = GetHeadRotation(headController.control, rotationTarget.mainController.control.position - neckController.control.position);
+            float angle = Quaternion.Angle(headController.control.rotation, targetRotation);
+            if (angle <= headRotationDeadZone) {
+                Main.singleton.RemoveFixedDeltaTimeConsumer(RotateHeadControl);
+                rotatedHead = false;
+                return;
+            }
+
+
+            var rotationSpeed = 55f;
+            var change = Quaternion.RotateTowards(
+                headController.control.rotation,
+                targetRotation,
+                rotationSpeed * fixedDeltaTime
+            );
+            headController.control.SetPositionAndRotation(headController.control.position, change);
+        }
+
 
         public void OnDestinationReachedCallback() {
             

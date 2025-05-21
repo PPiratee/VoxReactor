@@ -68,16 +68,26 @@ namespace PPirate.VoxReactor
         }
         public void PushFixedDeltaTimeConsumer(Action<float> callback)
         {
-            if (fixedUpdateTimeConsumers.Contains(callback)) {
-                return;
+            try
+            {
+                if (fixedUpdateTimeConsumers.Contains(callback)) {
+                    return;
+                }
+                fixedUpdateTimeConsumers.Add(callback);
             }
-            fixedUpdateTimeConsumers.Add(callback);
+            catch (Exception e)
+            {
+            }
         }
         public void RemoveFixedDeltaTimeConsumer(Action<float> callback) {
-            if (fixedUpdateTimeConsumers.Contains(callback))
+            try
             {
-                consumersToRemove.Add(callback);
+                if (fixedUpdateTimeConsumers.Contains(callback))
+                {
+                    consumersToRemove.Add(callback);
+                }
             }
+            catch (Exception e) { }
             
         }
 
@@ -97,7 +107,7 @@ namespace PPirate.VoxReactor
             }
             catch (Exception e)
             {
-                logger.ERR("Exception caught: " + e);
+               // logger.ERR("Exception caught: " + e);
               
             }
         }
