@@ -20,7 +20,7 @@ namespace PPirate.VoxReactor
         }
 
         public void ToggleEnabled(bool val) {
-            plugin.SetBoolParamValue("enabled", val);
+          //  plugin.SetBoolParamValue("enabled", val);
         }
 
         public void ToggleCanMove(bool val)

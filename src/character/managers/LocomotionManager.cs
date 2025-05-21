@@ -22,6 +22,8 @@ namespace PPirate.VoxReactor
 
         private readonly FreeControllerV3 hipController;
 
+
+
         
         //TRANSLATION
 
@@ -45,7 +47,7 @@ namespace PPirate.VoxReactor
         private bool shouldFollowRotation = false;
 
         IntervalCoroutine rotateCheck;
-        private float followRotateDeadZone = 30f;
+        private float followRotateDeadZone = 45f;
         private float followRotateDeadZoneStop = 1f;
 
 
@@ -53,7 +55,8 @@ namespace PPirate.VoxReactor
         private float followInterval = 0.5f; //seconds
 
 
-   
+        //BOTH
+        bool shouldLookAtTranslationTargetIfTranslating = false;
 
 
         public LocomotionManager(VoxtaCharacter character) { 
@@ -88,6 +91,9 @@ namespace PPirate.VoxReactor
         public void SetTranslationTarget(Atom target)
         {
             this.transationTarget = target;
+        }
+        public void ToggleShouldLookAtTranslationTargetWhenWalking(bool val) {
+            shouldLookAtTranslationTargetIfTranslating = val;
         }
         public void ToggleFollowRotation(bool val) {
             
@@ -124,6 +130,10 @@ namespace PPirate.VoxReactor
             }
         }
         private void FollowRotationIntervalCallback() {
+            //if (shouldRotateToTranslationTargetIfTranslating
+            //    && isFollowTranslation){
+            //    return;
+            //}
             if (CheckShouldFollowRotate(followRotateDeadZone)) {
                 //UpdateRotationTargetPostion();
                 clsPlugin.ToggleEnabled(true);
@@ -184,6 +194,11 @@ namespace PPirate.VoxReactor
         }
         private void FollowRotation(float fixedTime)
         {//fixed update consumer
+            if (shouldLookAtTranslationTargetIfTranslating
+                && isFollowTranslation)
+            {
+                return;
+            }
             if (CheckShouldFollowRotate(followRotateDeadZoneStop))
             {
                 UpdateRotationTargetPostion();
@@ -217,6 +232,9 @@ namespace PPirate.VoxReactor
             if (CheckShouldFollow())
             {
                 UpdateTranslationTargetPostion();
+                if (shouldLookAtTranslationTargetIfTranslating) {
+                    UpdateRotationTargetPostion();
+                }
             }
             else
             {

@@ -12,6 +12,7 @@ namespace PPirate.VoxReactor
         private readonly VoxtaCharacter character;
         private readonly LocomotionManager locomotionManager;
 
+        JSONStorableBool toggleFollowPlayer;
 
         Atom playerHipAtom;
         public NavigationManager(VoxtaCharacter character)
@@ -21,7 +22,10 @@ namespace PPirate.VoxReactor
             locomotionManager = new LocomotionManager(character);
             AddChild(locomotionManager);
 
-            ToggleFollowPlayer(true);
+            //ToggleFollowPlayer(true);
+
+            toggleFollowPlayer = new JSONStorableBool("ToggleFollowPlayer", false, ToggleFollowPlayer);
+            Main.singleton.RegisterBool(toggleFollowPlayer);
         }
         public bool isFollowing = false;
         public void FollowAtom(Atom atomToFollow) {
@@ -40,10 +44,12 @@ namespace PPirate.VoxReactor
             if (val)
             {
                 FollowAtom(playerHipAtom);
+                locomotionManager.ToggleShouldLookAtTranslationTargetWhenWalking(true);
 
             }
             else { 
-                StopFollowAtom(); 
+                StopFollowAtom();
+                locomotionManager.ToggleShouldLookAtTranslationTargetWhenWalking(false);
             }
 
         }
