@@ -51,7 +51,7 @@ namespace PPirate.VoxReactor
         private bool shouldFollowRotation = false;
 
         IntervalCoroutine rotateCheck;
-        private float followRotateDeadZone = 45f;
+        private float followRotateDeadZone = 40f;
         private float followRotateDeadZoneStop = 1f;
 
 
